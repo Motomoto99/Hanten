@@ -1,0 +1,7 @@
+# PostgreSQLの設定
+POSTGRES_DB=hanten_db
+POSTGRES_USER=hanten_user
+POSTGRES_PASSWORD=your_super_strong_password
+
+# Djangoの設定
+DJANGO_SECRET_KEY=your_django_secret_key_here

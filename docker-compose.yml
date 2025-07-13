@@ -1,0 +1,45 @@
+version: '3.8' # docker-composeのバージョン指定
+
+services:
+  # サービス①：データベース (PostgreSQL)
+  db:
+    image: postgres:15
+    container_name: hanten_db
+    env_file:
+      - ./env.dev # 環境変数ファイルの指定
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data #データの保存場所
+    restart: always #自動再起動
+
+  # サービス②：バックエンド (Django)
+  backend:
+    build: ./backend # ./backendディレクトリにあるDockerfileを使って、コンテナを自作する
+    container_name: hanten_backend
+    env_file:
+      - ./env.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app # 手元のソースコードの変更が、コンテナに即反映されるようにする
+    command: > #起動時に実行するコマンド
+      sh -c "python manage.py migrate &&
+             uvicorn Hanten.asgi:application --host 0.0.0.0 --port 8000 --reload"
+    depends_on:
+      - db # dbサービスが起動してから、backendを起動する
+
+  # サービス③：フロントエンド (Next.js)
+  frontend:
+    build: ./frontend # ./frontendディレクトリにあるDockerfileを使って、コンテナを自作する
+    container_name: hanten_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # node_modulesは、コンテナの中のものを使うおまじない
+    depends_on:
+      - backend # backendサービスが起動してから、frontendを起動する
+
+volumes:
+  postgres_data:

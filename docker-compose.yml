@@ -1,5 +1,3 @@
-version: '3.8' # docker-composeのバージョン指定
-
 services:
   # サービス①：データベース (PostgreSQL)
   db:

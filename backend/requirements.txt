@@ -1,0 +1,15 @@
+# Django本体
+django
+
+# APIを作るための、事実上の標準ライブラリ
+djangorestframework
+
+# フロントエンドとの通信を許可するため
+django-cors-headers
+
+# PostgreSQLとDjangoを繋ぐための部品
+psycopg2-binary
+
+# WebSocket(Django Channels)を動かすための部品
+channels
+uvicorn

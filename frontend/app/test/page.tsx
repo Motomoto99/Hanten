@@ -4,7 +4,7 @@ import React from 'react'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 
-export default function page() {
+export default function Page() {
     const [data, setData] = useState({message: ''})
 
     useEffect(() => {

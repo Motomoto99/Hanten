@@ -81,14 +81,6 @@ import dj_database_url
 
 # docker-compose.ymlのenvironmentやenv.devから環境変数を読み込んで設定します
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',  # docker-compose.ymlで定義したサービス名
-        'PORT': '5432',
-    }
 }
 
 

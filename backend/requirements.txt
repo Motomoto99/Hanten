@@ -16,3 +16,5 @@ uvicorn
 
 gunicorn
 dj-database-url
+
+django-cors-headers

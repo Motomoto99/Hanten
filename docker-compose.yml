@@ -3,10 +3,8 @@ services:
   db:
     image: postgres:15
     container_name: hanten_db
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env.dev
     ports:
       - "5432:5432"
     volumes:
@@ -18,7 +16,7 @@ services:
     build: ./backend # ./backendディレクトリにあるDockerfileを使って、コンテナを自作する
     container_name: hanten_backend
     env_file:
-      - ./env.dev
+      - .env.dev
     ports:
       - "8000:8000"
     volumes:
@@ -29,7 +27,6 @@ services:
     depends_on:
       - db # dbサービスが起動してから、backendを起動する
     environment:
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 
   # サービス③：フロントエンド (Next.js)

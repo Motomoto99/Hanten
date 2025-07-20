@@ -13,3 +13,5 @@ psycopg2-binary
 # WebSocket(Django Channels)を動かすための部品
 channels
 uvicorn
+
+dj-database-url

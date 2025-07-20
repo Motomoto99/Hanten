@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'api.testdb'
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", # フロントエンド（Next.js）からのアクセスを許可
     "https://hanten-psi.vercel.app",   # ← 本番用の、Vercelの住所をここに追加！(あなたのURLに変えてくださいね)
 ]
+
+
+import dj_database_url
+import os
+
+DATABASES = {
+    'default' : dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}

@@ -3,8 +3,10 @@ services:
   db:
     image: postgres:15
     container_name: hanten_db
-    env_file:
-      - ./env.dev # 環境変数ファイルの指定
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -26,6 +28,9 @@ services:
              uvicorn Hanten.asgi:application --host 0.0.0.0 --port 8000 --reload"
     depends_on:
       - db # dbサービスが起動してから、backendを起動する
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 
   # サービス③：フロントエンド (Next.js)
   frontend:
@@ -39,5 +44,16 @@ services:
     depends_on:
       - backend # backendサービスが起動してから、frontendを起動する
 
+  adminer:
+    image: adminer
+    container_name: hanten_adminer
+    restart: always
+    ports:
+      - "8080:8080" # パソコンの8080番ポートを、Adminerに繋ぐ
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
+
+

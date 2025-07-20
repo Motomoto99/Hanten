@@ -1,7 +1,7 @@
 services:
   # サービス①：データベース (PostgreSQL)
   db:
-    image: postgres:15
+    image: postgres:16
     container_name: hanten_db
     env_file:
       - .env.dev

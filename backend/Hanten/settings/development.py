@@ -12,3 +12,10 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", # フロントエンド（Next.js）からのアクセスを許可
+]

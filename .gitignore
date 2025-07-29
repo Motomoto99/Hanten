@@ -45,3 +45,4 @@ venv/
 .vscode/
 
 /backend/staticfiles
+/backend/Hanten/staticfiles

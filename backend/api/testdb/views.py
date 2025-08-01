@@ -12,7 +12,7 @@ class Db(APIView):
 
         if hello_object:
             # データがあれば、そのテキストを返す
-            return Response(hello_object.text)
+            return Response({"message": hello_object.world})
         else:
             # データがなければ、親切なメッセージを返す
             return Response("データベースにデータがありません。", status=404)

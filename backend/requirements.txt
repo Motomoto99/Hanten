@@ -18,3 +18,5 @@ gunicorn
 dj-database-url
 
 django-cors-headers
+
+whitenoise[brotli]

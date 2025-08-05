@@ -18,6 +18,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", # フロントエンド（Next.js）からのアクセスを許可
+    "http://127.0.0.1:3000",  # 念のため、こちらも追加
 ]
 
 # =================================================================

@@ -25,10 +25,6 @@ export default function page() {
         // ユーザー情報をチェックする関数
         if (isLoaded && isSignedIn) {
             const checkUserStatus = async () => {
-                if (!isLoaded) {
-                    return;
-                }
-
                 try {
                     // Clerkから認証トークン（会員証）を取得
                     const token = await getToken();

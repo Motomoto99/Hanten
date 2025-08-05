@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import React from 'react'
-import {SignedIn,UserButton } from "@clerk/nextjs";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 export default function Header() {
     return (
@@ -18,12 +18,12 @@ export default function Header() {
                     <Link href="/create" className="create-button">
                         新規作成
                     </Link>
-                    <UserButton 
+                    <UserButton
                         appearance={{
-                            elements:{
-                                avatarBox:{
-                                    width:'35px',
-                                    height:'35px',
+                            elements: {
+                                avatarBox: {
+                                    width: '35px',
+                                    height: '35px',
                                 }
                             }
                         }}

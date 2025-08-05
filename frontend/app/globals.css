@@ -5,8 +5,6 @@
   flex-direction: column;
   /* ② 画面の高さいっぱいに広げる魔法 */
   min-height: 100vh;
-  /* ③ スマホサイズに横幅を制限する魔法 */
-  max-width: 390px;
   /* この数字は、好きなスマホの幅に変えてもいいですよ */
   /* ④ 画面の中央に寄せる魔法 */
   margin: 0 auto;
@@ -23,12 +21,13 @@
   /* 見た目のための、ちょっとしたお化粧 */
   padding: 10px 5px;
   /* 内側の余白 */
+  margin:0px 10px;
   background-color: #FFFFFF;
   /* 背景色 */
 }
-
 /* ヘッダーの中の、右側のボタンたちをまとめるためのスタイル */
 .header-actions {
+  width: 200px;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -61,7 +60,6 @@
   /* ホバー時のアニメーションを滑らかにします */
   transition: background-color 0.2s ease-in-out;
 }
-
 /* マウスを乗せたときのスタイル */
 .hanten-logo:hover {
   background-color: #8e44ad;
@@ -83,7 +81,7 @@
 
 /* ClerkサインインのUI */
 .auth-container {
-  height: 700px;
+  height: 650px;
   max-height: 700px;
   /* ② Flexboxで中身を中央に配置する魔法 */
   display: flex;
@@ -95,6 +93,7 @@
 
 /* フッターのスタイル ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー*/
 .footer {
+  width: 100%;
   height: 50px;
   color: white;
   background-color: #575757;

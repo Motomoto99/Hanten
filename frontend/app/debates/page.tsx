@@ -5,7 +5,7 @@ import React from 'react'
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 
 // ユーザー情報の型を定義しておくと、コードが安全になります
 interface UserProfile {
@@ -18,46 +18,69 @@ interface UserProfile {
 export default function page() {
     const router = useRouter();
     const [loading, setLoading] = useState(true); // ローディング状態を管理
-    const { getToken } = useAuth(); // getToken関数を取得
+    const { getToken } = useAuth();
+    const { isLoaded, isSignedIn, user } = useUser();
 
     useEffect(() => {
         // ユーザー情報をチェックする関数
-        const checkUserStatus = async () => {
-            try {
-                // Clerkから認証トークン（会員証）を取得
-                const token = await getToken();
+        if (isLoaded && isSignedIn) {
+            const checkUserStatus = async () => {
+                if (!isLoaded) {
+                    return;
+                }
 
-                // バックエンドに自分の情報を問い合わせる
-                const response = await axios.get<UserProfile>(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/`,
-                    {
-                        headers:{
-                            Authorization: `Bearer ${token}`
-                        }
+                try {
+                    // Clerkから認証トークン（会員証）を取得
+                    const token = await getToken();
+
+                    console.log("取得したトークン:", token);
+
+                    if (!token) {
+                        console.error("トークンが取得できませんでした。リクエストを中断します。");
+                        setLoading(false);
+                        return; // トークンがなければ、APIを呼び出さない！
                     }
-                );
-                const user = response.data;
 
-                // もしfirst_flagがTrueだったら...
-                if (user.first_flag) {
-                    // チュートリアルページに強制的にリダイレクト！
-                    router.push('/tutorial');
-                } else {
-                    // Falseなら、ローディングを終了してこのページを表示
+                    // バックエンドに自分の情報を問い合わせる
+                    const response = await axios.get<UserProfile>(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        }
+                    );
+                    const user = response.data;
+
+                    // もしfirst_flagがTrueだったら...
+                    if (user.first_flag) {
+                        // チュートリアルページに強制的にリダイレクト！
+                        router.push('/tutorial');
+                    } else {
+                        // Falseなら、ローディングを終了してこのページを表示
+                        setLoading(false);
+                    }
+                } catch (error) {
+                    console.error("ユーザー情報の取得に失敗しました:", error);
+                    // エラーが起きた場合も、とりあえずページは表示させる
                     setLoading(false);
                 }
-            } catch (error) {
-                console.error("ユーザー情報の取得に失敗しました:", error);
-                // エラーが起きた場合も、とりあえずページは表示させる
-                setLoading(false);
-            }
-        };
-        // このページが表示されたら、すぐにチェックを実行
-        checkUserStatus();
-    }, [router]); // useEffectの依存配列にrouterを追加
+            };
+            // このページが表示されたら、すぐにチェックを実行
+            checkUserStatus();
+        }
+        // もしClerkの準備ができたのに、サインインしていなかったらログインページに飛ばす
+        if (isLoaded && !isSignedIn) {
+            router.push('/sign-in');
+        }
+    }, [isLoaded, isSignedIn, router, getToken]); // useEffectの依存配列にrouterを追加
 
     // ローディング中は、何も表示しないか、ローディング画面を表示
+    if (!isLoaded) {
+        return <div>セッション情報を確認中...</div>;
+    }
+
     if (loading) {
-        return <div>Now Loading...</div>;
+        return <div>ユーザー情報を読み込み中...</div>;
     }
 
     return (

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'api.testdb',
-    'api.user'
+    'api.user',
+    'api.webhook',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'clerk_django.middleware.ClerkMiddleware',
+    'clerk_django.middlewares.clerk.ClerkAuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -129,8 +130,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
+# ログインを許可するフロントエンドのURLリスト
+ALLOWED_PARTIES = [
+    "http://localhost:3000",
+    "https://hanten-psi.vercel.app", # Vercelの本番URL
+]
 
 
 

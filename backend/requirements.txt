@@ -24,5 +24,8 @@ whitenoise[brotli]
 svix
 
 clerk-django
+requests
+
+cryptography
 
 # Django Channlesみたいなやつ入れてないけど大丈夫なのかな

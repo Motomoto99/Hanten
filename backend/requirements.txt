@@ -23,4 +23,6 @@ whitenoise[brotli]
 
 svix
 
+clerk-django
+
 # Django Channlesみたいなやつ入れてないけど大丈夫なのかな

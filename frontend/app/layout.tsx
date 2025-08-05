@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/common/Header";
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
+import { ClerkProvider, SignedIn} from "@clerk/nextjs";
 import Footer from "./components/common/Footer";
 import Navigation from "./components/common/Navigation";
 

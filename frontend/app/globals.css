@@ -1,42 +1,103 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 全体のコンテナのスタイル ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー*/
+.container {
+  /* ① 子要素を縦に並べる魔法 */
+  display: flex;
+  flex-direction: column;
+  /* ② 画面の高さいっぱいに広げる魔法 */
+  min-height: 100vh;
+  /* ③ スマホサイズに横幅を制限する魔法 */
+  max-width: 390px;
+  /* この数字は、好きなスマホの幅に変えてもいいですよ */
+  /* ④ 画面の中央に寄せる魔法 */
+  margin: 0 auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ヘッダースタイルーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー */
+.header {
+  /* ① Flexboxを有効にする魔法 */
+  display: flex;
+  /* ② 要素を両端に寄せる魔法 (ロゴが左、ボタンが右) */
+  justify-content: space-between;
+  /* ③ 要素の縦方向の位置を中央に揃える魔法 */
+  align-items: center;
+  /* 見た目のための、ちょっとしたお化粧 */
+  padding: 10px 5px;
+  /* 内側の余白 */
+  background-color: #FFFFFF;
+  /* 背景色 */
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+/* ヘッダーの中の、右側のボタンたちをまとめるためのスタイル */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  /* ボタンとボタンの間の隙間 */
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
+/* ロゴ本体のスタイル */
+.hanten-logo {
+  /* ロゴの背景色 */
+  background-color: #9b59b6;
+  /* 画像に近い、上品な紫色を選んであげました */
+  /* テキストの色 */
+  color: white;
+  /* 角を丸くする設定 */
+  border-radius: 8px;
+  /* 内側の余白 */
+  padding: 5px 24px 13px 24px;
+  /* 外側の余白 */
+  /* フォントの設定 */
+  font-family: 'Noto Sans JP', sans-serif;
+  /* 日本語も綺麗に表示できるフォントです */
+  font-weight: 700;
+  /* 太字 */
+  font-size: 20px;
+  /* 文字の大きさ */
+  /* リンクの下線を消すおまじない */
   text-decoration: none;
+  /* 文字が選択できないようにします */
+  user-select: none;
+  /* ホバー時のアニメーションを滑らかにします */
+  transition: background-color 0.2s ease-in-out;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* マウスを乗せたときのスタイル */
+.hanten-logo:hover {
+  background-color: #8e44ad;
+  /* 少し濃い紫色に変わります */
+}
+
+
+/* コンテンツーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー */
+/* メインコンテンツエリアのスタイル */
+.main-content {
+  /* ⑤ フッターを一番下に押しやる魔法 */
+  flex-grow: 1;
+  /* ② このエリア自体も、子供を操る魔法使いにする！ */
+  display: flex;
+  flex-direction: column;
+  /* 子供を縦に並べる */
+  background-color: #EEEEEE;
+}
+
+/* ClerkサインインのUI */
+.auth-container {
+  height: 700px;
+  max-height: 700px;
+  /* ② Flexboxで中身を中央に配置する魔法 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+/* フッターのスタイル ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー*/
+.footer {
+  height: 50px;
+  color: white;
+  background-color: #575757;
+  text-align: center;
+  align-content: center
 }

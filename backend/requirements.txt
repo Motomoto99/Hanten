@@ -20,3 +20,7 @@ dj-database-url
 django-cors-headers
 
 whitenoise[brotli]
+
+svix
+
+# Django Channlesみたいなやつ入れてないけど大丈夫なのかな

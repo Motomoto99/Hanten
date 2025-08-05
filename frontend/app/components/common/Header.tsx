@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import React from 'react'
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import {SignedIn,UserButton } from "@clerk/nextjs";
 
 export default function Header() {
     return (

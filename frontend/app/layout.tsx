@@ -4,7 +4,6 @@ import "./globals.css";
 import Header from "./components/common/Header";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import Footer from "./components/common/Footer";
-import { buildClerkProps } from "@clerk/nextjs/server";
 import Navigation from "./components/common/Navigation";
 
 const geistSans = Geist({

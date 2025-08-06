@@ -2,6 +2,9 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .models import User
+from .serializers import UserSerializer
+
 # Create your views here.
 class Me(APIView):
     """
@@ -9,9 +12,9 @@ class Me(APIView):
     """
     def get(self, request): #GETリクエストの場合かな
         # Clerkが認証したユーザーIDを取得
-        clerk_user_id = request.auth.get('user_id')
+        clerk_user_id = request.clerk_user.get('id')
         if not clerk_user_id:
-            return Response({"error": "認証されていません"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "認証されていません"}, status=401)
         
         try:
             # Clerk IDを元に、データベースから自分のユーザー情報を探す
@@ -20,11 +23,11 @@ class Me(APIView):
             # フロントエンドに、綺麗なJSONで情報を返す
             return Response(serializer.data)
         except User.DoesNotExist:
-            return Response({"error": "ユーザーが見つかりません"}, status=status.HTTP_404_NOT_FOUND)
-    
-    """
-    初回ログイン時のプロフィール情報を更新する
-    """
+            return Response({"error": "ユーザーが見つかりません"}, status=404)
+
+    # """
+    # 初回ログイン時のプロフィール情報を更新する
+    # """
     # put(self, request):
     #     """
     #     初回ログイン時のプロフィール情報を更新する

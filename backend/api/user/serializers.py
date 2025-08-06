@@ -8,4 +8,4 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # フロントエンドに渡したいフィールドだけをここに書きます
-        fields = [__all__]
+        fields = '__all__'

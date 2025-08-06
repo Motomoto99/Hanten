@@ -7,6 +7,10 @@ djangorestframework
 # フロントエンドとの通信を許可するため
 django-cors-headers
 
+# Djangoの認証を強化するためのライブラリ
+clerk-django
+requests
+
 # PostgreSQLとDjangoを繋ぐための部品
 psycopg2-binary
 
@@ -22,9 +26,6 @@ django-cors-headers
 whitenoise[brotli]
 
 svix
-
-clerk-django
-requests
 
 cryptography
 

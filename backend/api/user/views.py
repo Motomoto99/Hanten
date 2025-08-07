@@ -11,9 +11,11 @@ class Me(APIView):
     ログイン中のユーザー情報を取得する
     """
     def get(self, request): #GETリクエストの場合かな
+        print("--- /api/user/me/ GETリクエスト受信 ---")
         # Clerkが認証したユーザーIDを取得
         clerk_user_id = request.clerk_user.get('id')
         if not clerk_user_id:
+            print("[ERROR] 環境変数 'CLERK_SECRET_KEY' が設定されていません！")
             return Response({"error": "認証されていません"}, status=401)
 
         #ClerkのWebhookはより先にこっちでユーザーを探しても見つからないからここで検索して見つからなかったら登録する
@@ -36,6 +38,7 @@ class Me(APIView):
         #     )
 
         try:
+            print("IDを基にユーザー情報を取得開始...")
             # Clerk IDを元に、データベースから自分のユーザー情報を探す
             user = User.objects.get(clerk_user_id=clerk_user_id)
             serializer = UserSerializer(user)

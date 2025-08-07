@@ -16,6 +16,7 @@ class Me(APIView):
         if not clerk_user_id:
             return Response({"error": "認証されていません"}, status=401)
 
+        #ClerkのWebhookはより先にこっちでユーザーを探しても見つからないからここで検索して見つからなかったら登録する
         # try:
         #     # まず、メールアドレスで既存ユーザーを探す
         #     user = User.objects.get(email=email_address)

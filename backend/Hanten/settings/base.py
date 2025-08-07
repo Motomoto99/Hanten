@@ -129,7 +129,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ログインを許可するフロントエンドのURLリスト
-ALLOWED_PARTIES = [
+CLERK_ALLOWED_PARTIES = [
     "http://localhost:3000",
     "https://hanten-psi.vercel.app", # Vercelの本番URL
 ]

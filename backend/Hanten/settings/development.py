@@ -13,6 +13,9 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = ['localhost']
+
+
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 

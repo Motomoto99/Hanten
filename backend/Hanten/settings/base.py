@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-($h+wczw$la8*b_%kzn)@k&7w!7r+8bbzfwdc^y^m=)0lx#869
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hanten.onrender.com','localhost','*']
 
 
 # Application definition
@@ -83,9 +82,6 @@ WSGI_APPLICATION = 'Hanten.wsgi.application'
 import os
 import dj_database_url
 
-# docker-compose.ymlのenvironmentやenv.devから環境変数を読み込んで設定します
-DATABASES = {
-}
 
 
 

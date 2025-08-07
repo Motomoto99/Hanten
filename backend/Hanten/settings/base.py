@@ -133,7 +133,7 @@ ALLOWED_PARTIES = [
 ]
 
 # --- Clerkの合言葉（どのフロントエンドを信用するか） ---
-ALLOWED_PARTIES = [
+ALLOWED_HOSTS = [
     "http://localhost:3000",
     "https://hanten-psi.vercel.app", # Vercelの本番URL
 ]

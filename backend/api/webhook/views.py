@@ -5,6 +5,8 @@ from rest_framework import status
 from svix.webhooks import Webhook, WebhookVerificationError
 from api.user.models import User  # usersアプリのモデルをインポート
 import os
+import json
+from django.utils import timezone
 
 # Create your views here.
 class Clerk(APIView):
@@ -39,14 +41,53 @@ class Clerk(APIView):
         # 新規ユーザーが作成されたイベントの場合
         if event_type == 'user.created':
             data = payload['data']
-            clerk_user_id = data['id']
-            
-            # DBに同じユーザーがいなければ、作成する
-            if not User.objects.filter(clerk_user_id=clerk_user_id).exists():
+            clerk_user_id = data.get('id')
+            # メールアドレスも取得する
+            email_address = data.get('email_addresses', [{}])[0].get('email_address')
+
+            if not all([clerk_user_id, email_address]):
+                return Response({"error": "IDまたはメールアドレスが不足しています"}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                # まず、メールアドレスで既存ユーザーを探す
+                user = User.objects.get(email=email_address)
+                
+                # 見つかった -> 復帰処理
+                user.clerk_user_id = clerk_user_id # 新しいClerk IDに更新
+                user.deleted_date = None          # 退会日を消去
+                user.first_flag = True            # もう一度初回ログイン扱いに
+                user.save()
+
+            except User.DoesNotExist:
+                # 見つからなかった -> 本当の新規登録
                 User.objects.create(
                     clerk_user_id=clerk_user_id,
-                    # 最初は仮のユーザー名を入れておく
-                    user_name=f"user_{clerk_user_id[:8]}" 
+                    email=email_address,
+                    user_name=clerk_user_id # 仮のユーザー名
                 )
+                
+
+        
+        # ユーザーが削除された場合
+        elif event_type == 'user.deleted':
+            data = payload['data']
+            clerk_user_id = data.get('id')
+
+            # Clerk IDがちゃんと存在するか確認
+            if not clerk_user_id:
+                return Response({"error": "ClerkユーザーIDがペイロードに含まれていません"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # DBから該当するユーザーを探す
+            try:
+                user_to_delete = User.objects.get(clerk_user_id=clerk_user_id)
+                
+                # ユーザーをDBから完全に消すのではなく、「退会日時」に今の時刻を入れる（ソフトデリート）
+                if user_to_delete.deleted_date is None:
+                    user_to_delete.deleted_date = timezone.now()
+                    user_to_delete.save()
+
+            except User.DoesNotExist:
+                # もしDBに該当ユーザーがいなくても、エラーにはせず、静かに終了する
+                pass
         
         return Response(status=status.HTTP_200_OK)

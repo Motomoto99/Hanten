@@ -17,6 +17,12 @@ class User(models.Model):
         verbose_name="ユーザー名"
     )
 
+     # ユーザーを特定するための、一番大事なキーになります
+    email = models.EmailField(
+        unique=True,
+        verbose_name="メールアドレス"
+    )
+
     # 初回ログインフラグ (first_flag)
     first_flag = models.BooleanField(
         default=True, # 新規ユーザーは必ず初回ログインなので、Trueをデフォルトにします

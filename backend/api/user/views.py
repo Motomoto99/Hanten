@@ -16,23 +16,23 @@ class Me(APIView):
         if not clerk_user_id:
             return Response({"error": "認証されていません"}, status=401)
 
-        try:
-            # まず、メールアドレスで既存ユーザーを探す
-            user = User.objects.get(email=email_address)
+        # try:
+        #     # まず、メールアドレスで既存ユーザーを探す
+        #     user = User.objects.get(email=email_address)
                 
-            # 見つかった -> 復帰処理
-            user.clerk_user_id = clerk_user_id # 新しいClerk IDに更新
-            user.deleted_date = None          # 退会日を消去
-            user.first_flag = True            # もう一度初回ログイン扱いに
-            user.save()
+        #     # 見つかった -> 復帰処理
+        #     user.clerk_user_id = clerk_user_id # 新しいClerk IDに更新
+        #     user.deleted_date = None          # 退会日を消去
+        #     user.first_flag = True            # もう一度初回ログイン扱いに
+        #     user.save()
 
-        except User.DoesNotExist:
-            # 見つからなかった -> 本当の新規登録
-            User.objects.create(
-                clerk_user_id=clerk_user_id,
-                email=email_address,
-                user_name=clerk_user_id # 仮のユーザー名
-            )
+        # except User.DoesNotExist:
+        #     # 見つからなかった -> 本当の新規登録
+        #     User.objects.create(
+        #         clerk_user_id=clerk_user_id,
+        #         email=email_address,
+        #         user_name=clerk_user_id # 仮のユーザー名
+        #     )
 
         try:
             # Clerk IDを元に、データベースから自分のユーザー情報を探す

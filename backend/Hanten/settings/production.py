@@ -33,10 +33,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-CSRF_ALLOWED_ORIGINS = [
-    'https://hanten-psi.vercel.app',  # Vercelの本番URL
-]
-
 
 
 

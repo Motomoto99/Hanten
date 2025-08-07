@@ -38,10 +38,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://hanten-psi.vercel.app",   # ← 本番用の、Vercelの住所をここに追加！(あなたのURLに変えてくださいね)
 ]
 
-# CSRF設定: Vercelを信頼できるオリジンとして追加
-CSRF_TRUSTED_ORIGINS = [
-    'https://hanten-psi.vercel.app',
-]
+
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

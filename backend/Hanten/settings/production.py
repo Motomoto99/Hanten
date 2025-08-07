@@ -32,8 +32,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://hanten-psi.vercel.app",   # ← 本番用の、Vercelの住所をここに追加！(あなたのURLに変えてくださいね)
 ]
 
-# # CORS_ALLOWED_ORIGINSは、フロントエンドのURLを許可するための設定です。
-CERF_ALLOWED_ORIGINS = [
+
+CSRF_ALLOWED_ORIGINS = [
     'https://hanten-psi.vercel.app',  # Vercelの本番URL
 ]
 
@@ -51,7 +51,3 @@ SUPERUSER_NAME = os.environ.get('SUPERUSER_NAME')
 SUPERUSER_EMAIL = os.environ.get('SUPERUSER_EMAIL')
 SUPERUSER_PASSWORD = os.environ.get('SUPERUSER_PASSWORD')
 
-ALLOWED_HOSTS = [
-    'hanten.onrender.com', # RenderのバックエンドURL
-    'hanten-psi.vercel.app',  # Vercelの本番URL
-]

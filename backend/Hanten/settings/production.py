@@ -27,11 +27,6 @@ DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
-# 許可するホスト名（RenderのドメインとVercelのドメイン）
-ALLOWED_HOSTS = [
-    'hanten.onrender.com',      # Renderのバックエンドドメイン
-    'hanten-psi.vercel.app',  # Vercelのフロントエンドドメイン
-]
 
 CORS_ALLOWED_ORIGINS = [
     "https://hanten-psi.vercel.app",   # ← 本番用の、Vercelの住所をここに追加！(あなたのURLに変えてくださいね)

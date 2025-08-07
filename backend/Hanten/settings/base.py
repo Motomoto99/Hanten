@@ -55,7 +55,6 @@ MIDDLEWARE = [
     'clerk_django.middlewares.clerk.ClerkAuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'clerk_django.middlewares.clerk.ClerkAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'Hanten.urls'

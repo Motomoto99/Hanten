@@ -1,5 +1,3 @@
-import os
-import dj_database_url
 from .base import * # 最初に、共通ルール(base.py)を全部読み込みます！
 from django.core.exceptions import ImproperlyConfigured
 

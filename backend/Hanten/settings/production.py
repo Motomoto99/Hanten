@@ -1,5 +1,7 @@
-from .base import *
 import os
+import dj_database_url
+from .base import * # 最初に、共通ルール(base.py)を全部読み込みます！
+from django.core.exceptions import ImproperlyConfigured
 
 DEBUG = False
 
@@ -18,7 +20,6 @@ if SECRET_KEY is None:
 
 # 環境変数 DATABASE_URL を取得
 DATABASE_URL = os.environ.get('DATABASE_URL')
-
 # もしDATABASE_URLが設定されていなかったら、分かりやすいエラーを出す
 if DATABASE_URL is None:
     raise ImproperlyConfigured("本番環境変数 'DATABASE_URL' が設定されていません。Renderのダッシュボードを確認してください。")

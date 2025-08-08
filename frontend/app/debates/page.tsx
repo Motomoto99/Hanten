@@ -29,7 +29,7 @@ export default function page() {
                     // Clerkから認証トークン（会員証）を取得
                     const token = await getToken();
 
-                    console.log("取得したトークン:", token);
+                    // console.log("取得したトークン:", token);
 
                     if (!token) {
                         console.error("トークンが取得できませんでした。リクエストを中断します。");
@@ -59,6 +59,7 @@ export default function page() {
                     console.error("ユーザー情報の取得に失敗しました:", error);
                     // エラーが起きた場合も、とりあえずページは表示させる
                     setLoading(false);
+                    router.push('/'); // デフォルトのページにリダイレクト
                 }
             };
             // このページが表示されたら、すぐにチェックを実行

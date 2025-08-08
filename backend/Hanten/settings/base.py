@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-($h+wczw$la8*b_%kzn)@k&7w!7r+8bbzfwdc^y^m=)0lx#869
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hanten.onrender.com','localhost','hanten-psi.vercel.app', '127.0.0.1']
+ALLOWED_HOSTS = ['hanten.onrender.com','localhost','hanten-psi.vercel.app', '127.0.0.1','*']
 
 # Application definition
 
@@ -129,7 +129,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ログインを許可するフロントエンドのURLリスト
-CLERK_ALLOWED_PARTIES = [
+ALLOWED_PARTIES = [
     "http://localhost:3000",
     "https://hanten-psi.vercel.app", # Vercelの本番URL
 ]

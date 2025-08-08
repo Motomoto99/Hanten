@@ -54,6 +54,7 @@ class Clerk(APIView):
                 
                 # 見つかった -> 復帰処理
                 user.clerk_user_id = clerk_user_id # 新しいClerk IDに更新
+                user.user_name = clerk_user_id  # 仮のユーザー名を設定
                 user.deleted_date = None          # 退会日を消去
                 user.first_flag = True            # もう一度初回ログイン扱いに
                 user.save()
@@ -72,6 +73,7 @@ class Clerk(APIView):
         elif event_type == 'user.deleted':
             data = payload['data']
             clerk_user_id = data.get('id')
+            print("受診を受け取り処理開始")
 
             # Clerk IDがちゃんと存在するか確認
             if not clerk_user_id:
@@ -79,15 +81,18 @@ class Clerk(APIView):
 
             # DBから該当するユーザーを探す
             try:
+                print("ユーザー削除イベントを受信: ID =", clerk_user_id)
                 user_to_delete = User.objects.get(clerk_user_id=clerk_user_id)
                 
                 # ユーザーをDBから完全に消すのではなく、「退会日時」に今の時刻を入れる（ソフトデリート）
                 if user_to_delete.deleted_date is None:
+                    print("ユーザーをソフトデリート: ID =", clerk_user_id)
                     user_to_delete.deleted_date = timezone.now()
                     user_to_delete.save()
 
             except User.DoesNotExist:
                 # もしDBに該当ユーザーがいなくても、エラーにはせず、静かに終了する
+                print("ユーザーが見つかりませんでした: ID =", clerk_user_id)
                 pass
         
         return Response(status=status.HTTP_200_OK)

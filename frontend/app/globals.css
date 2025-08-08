@@ -28,7 +28,6 @@
 }
 /* ヘッダーの中の、右側のボタンたちをまとめるためのスタイル */
 .header-actions {
-  width: 200px;
   display: flex;
   align-items: center;
   gap: 1rem;

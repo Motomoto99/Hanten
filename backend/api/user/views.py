@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 
 from .models import User
 from .serializers import UserSerializer
@@ -38,7 +39,7 @@ class Me(APIView):
         #     )
 
         try:
-            print("IDを基にユーザー情報を取得開始...")
+            print("IDを基にユーザー情報を取得開始...",clerk_user_id)
             # Clerk IDを元に、データベースから自分のユーザー情報を探す
             user = User.objects.get(clerk_user_id=clerk_user_id)
             serializer = UserSerializer(user)
@@ -47,27 +48,28 @@ class Me(APIView):
         except User.DoesNotExist:
             return Response({"error": "ユーザーが見つかりません"}, status=404)
 
-    # """
-    # 初回ログイン時のプロフィール情報を更新する
-    # """
-    # put(self, request):
-    #     """
-    #     初回ログイン時のプロフィール情報を更新する
-    #     """
-    #     clerk_user_id = request.auth.get('user_id')
-    #     if not clerk_user_id:
-    #         return Response({"error": "認証されていません"}, status=status.HTTP_401_UNAUTHORIZED)
+    """
+    初回ログイン時のプロフィール情報を更新する
+    """
+    def put(self, request):
+        clerk_user_id = request.clerk_user.get('id')
+        if not clerk_user_id:
+            return Response({"error": "認証されていません"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    #     try:
-    #         user = User.objects.get(clerk_user_id=clerk_user_id)
-            
-    #         # フロントエンドから送られてきた新しいユーザー名で更新
-    #         user.user_name = request.data.get('user_name', user.user_name)
-    #         # 初回フラグをFalseにする
-    #         user.first_flag = False
-    #         user.save()
+        # Clerk IDを元に、更新対象のユーザーを取得
+        try:
+            user = User.objects.get(clerk_user_id=clerk_user_id)
+        except User.DoesNotExist:
+            return Response({"error": "ユーザーが見つかりません"}, status=status.HTTP_404_NOT_FOUND)
 
-    #         serializer = UserSerializer(user)
-    #         return Response(serializer.data)
-    #     except User.DoesNotExist:
-    #         return Response({"error": "ユーザーが見つかりません"}, status=status.HTTP_404_NOT_FOUND)
+        # フロントエンドから送られてきた新しいユーザー名を取得
+        new_user_name = request.data.get('user_name')
+        if not new_user_name:
+            return Response({"error": "ユーザー名が指定されていません"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # ユーザー名と初回フラグを更新
+        user.user_name = new_user_name
+        user.first_flag = False
+        user.save()
+
+        return Response(status=status.HTTP_200_OK)

@@ -51,7 +51,7 @@ class Clerk(APIView):
             try:
                 # まず、メールアドレスで既存ユーザーを探す
                 user = User.objects.get(email=email_address)
-                
+                print('ユーザー情報を更新します:', clerk_user_id,user.clerk_user_id)
                 # 見つかった -> 復帰処理
                 user.clerk_user_id = clerk_user_id # 新しいClerk IDに更新
                 user.user_name = clerk_user_id  # 仮のユーザー名を設定

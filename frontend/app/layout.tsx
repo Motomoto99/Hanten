@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/common/Header";
-import { ClerkProvider, SignedIn} from "@clerk/nextjs";
+import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
 import Footer from "./components/common/Footer";
 import Navigation from "./components/common/Navigation";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,14 +34,7 @@ export default function RootLayout({
       <html lang="ja">
         <body className={`${geistSans.variable} ${geistMono.variable} container`}>
 
-          <Header />
-          <SignedIn>
-            <Navigation/>
-          </SignedIn>
-          <main className="main-content">
             {children}
-          </main>
-          <Footer />
 
         </body>
       </html>

@@ -1,0 +1,27 @@
+.navContainer {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0px 0px 5px 0px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.navLink {
+    text-decoration: none;
+    color: #888;
+    font-weight: 600;
+    padding: 0.5rem 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.navLink:hover {
+    color: #333;
+}
+
+.navLink.active {
+    color: #9b59b6;
+    /* ロゴの色と合わせました */
+    border-bottom-color: #9b59b6;
+}

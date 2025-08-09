@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'api.testdb',
     'api.user',
+    'api.debate',
     'api.webhook',
 ]
 

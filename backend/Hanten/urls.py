@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/testdb/', include('api.testdb.urls')),
     path('api/user/', include('api.user.urls')),
     path('api/webhook/', include('api.webhook.urls')),
-    # path('api/debate/', include('api.debate.urls')),
+    path('api/debate/', include('api.debate.urls')),
     # path('api/messaging/', include('api.messaging.urls')),
 ]
 

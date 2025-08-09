@@ -20,9 +20,7 @@
   /* ③ 要素の縦方向の位置を中央に揃える魔法 */
   align-items: center;
   /* 見た目のための、ちょっとしたお化粧 */
-  padding: 10px 5px;
-  /* 内側の余白 */
-  margin:0px 10px;
+  padding: 10px 15px;
   background-color: #FFFFFF;
   /* 背景色 */
 }
@@ -64,6 +62,22 @@
 .hanten-logo:hover {
   background-color: #8e44ad;
   /* 少し濃い紫色に変わります */
+}
+
+.create-button {
+  background-color: white;
+  color: #9b59b6;
+  border: 2px solid #9b59b6;
+  padding: 5px 15px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* ボタンが改行しないように */
+}
+.create-button:hover {
+  background-color: #f8f0fc;
+  color: #8e44ad;
 }
 
 

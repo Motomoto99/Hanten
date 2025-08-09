@@ -49,9 +49,10 @@ class Clerk(APIView):
                 return Response({"error": "IDまたはメールアドレスが不足しています"}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
+                print('Emailアドレスでユーザーを検索:', email_address)
                 # まず、メールアドレスで既存ユーザーを探す
                 user = User.objects.get(email=email_address)
-                print('ユーザー情報を更新します:', clerk_user_id,user.clerk_user_id)
+                print('ユーザー情報を更新します:', clerk_user_id,user.clerk_user_id,timezone.now())
                 # 見つかった -> 復帰処理
                 user.clerk_user_id = clerk_user_id # 新しいClerk IDに更新
                 user.user_name = clerk_user_id  # 仮のユーザー名を設定

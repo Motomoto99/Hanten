@@ -58,6 +58,7 @@ class Me(APIView):
 
         # Clerk IDを元に、更新対象のユーザーを取得
         try:
+            print("IDを基にユーザー情報を取得開始...", clerk_user_id)
             user = User.objects.get(clerk_user_id=clerk_user_id)
         except User.DoesNotExist:
             return Response({"error": "ユーザーが見つかりません"}, status=status.HTTP_404_NOT_FOUND)
@@ -67,6 +68,7 @@ class Me(APIView):
         if not new_user_name:
             return Response({"error": "ユーザー名が指定されていません"}, status=status.HTTP_400_BAD_REQUEST)
         
+        print('/user/me/のPUTリクエスト受信:', clerk_user_id, new_user_name)
         # ユーザー名と初回フラグを更新
         user.user_name = new_user_name
         user.first_flag = False

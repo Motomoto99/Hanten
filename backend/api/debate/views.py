@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from .models import Room
 from .serializers import RoomListSerializer, RoomDetailSerializer
+from django.db.models import Count # Countをインポート
 # from api.permissions.clerk import ClerkAuthenticated
 
 class DebateListAPIView(generics.ListAPIView):

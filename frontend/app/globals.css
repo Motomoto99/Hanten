@@ -86,6 +86,7 @@
 .main-content {
   /* 広がる幅を制御する */
   max-width:500px;
+  min-width: 380px;
   /* 中央に寄せる */
   margin: 0 auto;
   /* ⑤ フッターを一番下に押しやる魔法 */

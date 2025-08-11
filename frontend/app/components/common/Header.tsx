@@ -8,7 +8,7 @@ export default function Header() {
     return (
         <header className='header'>
 
-            <Link href="/" className='hanten-logo'>
+            <Link href="/debates" className='hanten-logo'>
                 Hanten
             </Link>
 

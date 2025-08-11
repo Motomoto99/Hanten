@@ -30,7 +30,7 @@
 }
 
 .contentCard:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -43,13 +43,35 @@
     font-size: 1.25rem;
     font-weight: bold;
     margin: 0.5rem 0;
+    margin: 5px 10px 0px 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* 表示する行数を2行に指定 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .participantInfo {
     font-size: 0.9rem;
-    color: #e74c3c;
     font-weight: 500;
+    text-align: right;
 }
+
+/* 参加人数 */
+.count {
+    color: #e74c3c;
+    /* 数字だけを赤色に */
+    font-weight: bold;
+}
+
+/* 参加状況 */
+.participant {
+    color: #505050;
+    /* 終了済みは数字もグレーに */
+    font-weight: bold;
+}
+
 
 /* ポップアップ（モーダル） */
 .modalOverlay {
@@ -70,7 +92,7 @@
     padding: 2rem;
     border-radius: 12px;
     width: 90%;
-    max-width: 500px;
+    max-width: 450px;
 }
 
 /* 詳細表示 */
@@ -103,7 +125,7 @@
 .buttonArea {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 2rem;
 }
 
 .btn {
@@ -124,16 +146,68 @@
     background-color: #2ecc71;
     color: white;
     width: 100%;
+    max-width: 150px;
 }
 
 .btnAgree {
-    background-color: #e74c3c;
+    background-color: #DD5052;
     color: white;
     flex: 1;
+    max-width: 150px;
 }
 
 .btnDisagree {
-    background-color: #3498db;
+    background-color: #348BCF;
     color: white;
     flex: 1;
+    max-width: 150px;
+}
+
+/* 参加人数の色分け */
+.participantInfo {
+    font-size: 0.9rem;
+    color: #e74c3c;
+    /* 開催中：赤 */
+    font-weight: 500;
+    text-align: right;
+}
+
+.participantInfoFinished {
+    font-size: 0.9rem;
+    color: #888;
+    /* 終了済み：グレー */
+    font-weight: 500;
+    text-align: right;
+}
+
+/* タブ */
+.tabContainer {
+    display: flex;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 1.5rem;
+}
+
+.tab,
+.activeTab {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #888;
+    border-bottom: 3px solid transparent;
+}
+
+.activeTab {
+    color: #9b59b6;
+    border-bottom-color: #9b59b6;
+}
+
+/* リストの終端 */
+.endOfList {
+    text-align: center;
+    color: #888;
+    padding: 2rem;
 }

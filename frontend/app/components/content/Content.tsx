@@ -9,6 +9,7 @@ export interface Debate {
   room_start: string;
   room_end: string;
   theme_title: string;
+  participant_count: number; // 参加者数
 }
 
 interface Props {
@@ -19,13 +20,19 @@ interface Props {
 export default function Content({ debate, onClick }: Props) {
   const startDate = new Date(debate.room_start).toLocaleDateString();
   const endDate = new Date(debate.room_end).toLocaleDateString();
+  const isFinished = new Date(debate.room_end) <= new Date();
 
   return (
     <div className={styles.contentCard} onClick={onClick}>
       <div className={styles.dateRange}>{startDate} 〜 {endDate}</div>
       <h3 className={styles.roomName}>{debate.room_name}</h3>
       <div className={styles.participantInfo}>
-        25人が参加中
+        <span className={styles.count}>
+          {debate.participant_count}人
+        </span>
+        <span className={styles.participant}>
+        {isFinished ? 'が参加しました' : 'が参加中'}
+        </span>
       </div>
     </div>
   );

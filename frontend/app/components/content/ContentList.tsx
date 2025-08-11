@@ -2,32 +2,39 @@
 
 import DebateContent, { Debate } from './Content';
 import styles from '../../css/Debates.module.css';
+import React, { forwardRef } from 'react'; // forwardRefをインポート
 
 interface Props {
-    title: string;
     debates: Debate[];
     onDebateClick: (debateId: number) => void;
 }
 
-export default function DebateContentList({ title, debates, onDebateClick }: Props) {
-    return (
+// forwardRefでコンポーネントをラップ
+const ContentList = forwardRef<HTMLDivElement, Props>(
+    ({debates, onDebateClick }, ref) => {
+      return (
         <section className={styles.listSection}>
-            <h2 className={styles.listTitle}>{title}</h2>
-            {debates.length > 0 ? (
-                <div className={styles.listGrid}>
-                    {debates.map((debate) => (
-                        <DebateContent
-                            key={debate.id}
-                            debate={debate}
-                            onClick={() => onDebateClick(debate.id)}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div>
-                    <p>該当するディベートはありません。</p>
-                </div>
-            )}
+          {/* titleはタブで表示するので不要に */}
+          {debates.length > 0 ? (
+            <div className={styles.listGrid}>
+              {debates.map((debate, index) => {
+                // 最後の要素にrefをアタッチ
+                if (debates.length === index + 1) {
+                  return (
+                    <div ref={ref} key={debate.id}>
+                      <DebateContent debate={debate} onClick={() => onDebateClick(debate.id)} />
+                    </div>
+                  );
+                }
+                return <DebateContent key={debate.id} debate={debate} onClick={() => onDebateClick(debate.id)} />;
+              })}
+            </div>
+          ) : (
+            <p>該当するディベートはありません。</p>
+          )}
         </section>
-    );
-}
+      );
+    }
+  );
+  
+  export default ContentList;

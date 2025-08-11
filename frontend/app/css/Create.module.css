@@ -1,0 +1,175 @@
+.container {
+  padding: 1rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.formGroup input,
+.themeSelector {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.durationButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.durationButtons button {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.durationButtons button.active {
+  background: #9b59b6;
+  color: white;
+  border-color: #9b59b6;
+  font-weight: bold;
+}
+
+.themeSelector {
+  cursor: pointer;
+  color: #555;
+  background: white;
+  text-align: left;
+}
+
+.themeDetail {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.backButton,
+.createButton {
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.backButton {
+  background: #bdc3c7;
+  color: white;
+}
+
+.createButton {
+  background: #3BBE57;
+  color: white;
+}
+
+.createButton:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+/* モーダル関連 */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modalHeader h2 {
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.themeList {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.themeItem {
+  padding: 1rem;
+  border: 1px solid #7f7f7f;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.themeItem.selected {
+  border-color: #9b59b6;
+  background: #f8f0fc;
+  border-width: 2px;
+}
+
+.themeItem h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.themeItem p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}

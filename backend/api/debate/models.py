@@ -21,6 +21,11 @@ class Room(models.Model):
     room_end = models.DateTimeField("ディベート終了日時")
     theme = models.ForeignKey(Theme, on_delete=models.CASCADE, related_name="rooms", verbose_name="テーマ")
     creator = models.ForeignKey(User, on_delete=models.PROTECT, related_name="created_rooms", verbose_name="作成者")
+    participants = models.ManyToManyField(
+        User, 
+        through='Participate', # どのモデルを仲介役にするか指定
+        related_name='participating_rooms'
+    )
 
     def __str__(self):
         return self.room_name

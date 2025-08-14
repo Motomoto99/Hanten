@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuth, useUser } from '@clerk/nextjs';
 import ContentList from '@/app/components/content/ContentList';
-import ContentDetail, { DebateDetailData } from '@/app/components/content/ContentDetail';
+import ContentDetail from '@/app/components/content/ContentDetail';
+import { DebateDetailData } from '@/app/types/debate';
 import { Debate } from '@/app/components/content/Content';
 import styles from '@/app/css/Debates.module.css';
 
@@ -72,7 +73,7 @@ function DebatesComponent() {
     const lastDebateElementRef = useCallback((node: HTMLDivElement | null) => {
         if (tabLoading) return;
         if (observer.current) observer.current.disconnect();
-        
+
         observer.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && nextPage[activeTab] !== null) {
                 fetchDebates(activeTab, nextPage[activeTab] as number);
@@ -100,7 +101,7 @@ function DebatesComponent() {
                 const response = await axios.get<UserProfile>(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                
+
                 if (response.data.first_flag) {
                     router.push('/tutorial');
                 } else {
@@ -133,7 +134,7 @@ function DebatesComponent() {
             router.replace('/debates', { scroll: false });
         }
     }, [searchParams, router]);
-    
+
     // 4. 個別ディベートの詳細を取得
     useEffect(() => {
         if (selectedDebateId !== null) {
@@ -155,7 +156,7 @@ function DebatesComponent() {
             fetchDebateDetail();
         }
     }, [selectedDebateId, getToken]);
-    
+
 
     const handleDebateClick = (debateId: number) => {
         setSelectedDebateId(debateId);
@@ -169,7 +170,7 @@ function DebatesComponent() {
     };
 
     if (pageLoading || !isLoaded) {
-        return <div>読み込み中...</div>;
+        return <div className={styles.center}>読み込み中...</div>;
     }
 
     return (
@@ -194,9 +195,9 @@ function DebatesComponent() {
                 onDebateClick={handleDebateClick}
                 ref={lastDebateElementRef}
             />
-            {tabLoading && <div>読み込み中...</div>}
+            {tabLoading && <div className={styles.center}>読み込み中...</div>}
             {!tabLoading && !nextPage[activeTab] && debates[activeTab].length > 0 && (
-                <div className={styles.endOfList}>最後のディベートです</div>
+                <div className={styles.center}>最後のディベートです</div>
             )}
 
             {isModalOpen && (
@@ -212,7 +213,7 @@ function DebatesComponent() {
 
 export default function DebatesPage() {
     return (
-        <Suspense fallback={<div>ページを準備中...</div>}>
+        <Suspense fallback={<div className={styles.center}>ページを準備中...</div>}>
             <DebatesComponent />
         </Suspense>
     );

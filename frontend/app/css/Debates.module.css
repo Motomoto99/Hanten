@@ -27,6 +27,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin: 0 5px;
 }
 
 .contentCard:hover {
@@ -206,8 +207,47 @@
 }
 
 /* リストの終端 */
-.endOfList {
+.center {
     text-align: center;
     color: #888;
     padding: 2rem;
+}
+
+/* ヘッダー全体 */
+.debateHeader {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* 戻るボタン */
+.backButton {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #868e96;
+    cursor: pointer;
+    padding: 0 1rem 0 0;
+}
+
+/* クリックできるタイトルエリア */
+.headerTitleClickable {
+    cursor: pointer;
+    flex-grow: 1;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* ヘッダーのタイトル */
+.headerTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 長いタイトルは「...」で省略 */
+    margin: 0;
 }

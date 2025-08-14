@@ -1,0 +1,125 @@
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* 親のレイアウトに高さいっぱいで広がる */
+
+    /* ★★★ モバイルのキーボード問題を解決するおまじない ★★★ */
+    /* 実際のビューポートの高さを取得し、キーボードに押されてもレイアウトが崩れないようにする */
+    min-height: 86vh;
+}
+
+.commentEreaWrapper {
+    flex-grow: 1;
+    /* ★★★ 残りの高さをすべて埋め尽くす魔法 ★★★ */
+
+    /* ★★★ 中身を上下左右中央に配置する魔法 ★★★ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 1rem;
+}
+
+.commentList {
+    flex-grow: 1;
+    /* ★★★ 残りの高さをすべて埋める魔法 ★★★ */
+    overflow-y: auto;
+    /* メッセージが溢れたらスクロール */
+    padding: 1rem;
+}
+
+
+.commentRow {
+    display: flex;
+    margin-bottom: 1rem;
+    max-width: 80%;
+}
+
+.myRow {
+    margin-left: auto;
+    justify-content: flex-end;
+}
+
+.otherRow {
+    margin-right: auto;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 0.75rem;
+}
+
+.commentContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.senderName {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 0.25rem;
+    padding-left: 0.2rem;
+}
+
+/* 吹き出しのスタイル */
+.myCommentBubble,
+.otherCommentBubble {
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.myCommentBubble {
+    background-color: #dcf8c6;
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    border-top-right-radius: 4px;
+    /* ★★★ この一行を追加！ ★★★ */
+    color: #303030;
+    /* 文字の色を、ちゃんと黒系の色に指定 */
+}
+
+.otherCommentBubble {
+    background-color: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    border-top-left-radius: 4px;
+    /* ★★★ この一行を追加！ ★★★ */
+    color: #303030;
+    /* こちらも、ちゃんと黒系の色に指定 */
+}
+
+/* 画面全体のコンテナ */
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    /* モバイルのビューポートの高さいっぱいを使う */
+    background-color: #e5ddd5;
+    /* LINE風の背景色 */
+}
+
+/* メッセージリストのエリア */
+.commentList {
+    flex-grow: 1;
+    /* 残りの高さをすべて埋める */
+    overflow-y: auto;
+    /* メッセージが溢れたらスクロール */
+    padding: 1rem;
+}

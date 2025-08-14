@@ -1,0 +1,171 @@
+/* 画面全体のコンテナ */
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* 親のレイアウトに高さいっぱいで広がる */
+
+    /* ★★★ モバイルのキーボード問題を解決するおまじない ★★★ */
+    /* 実際のビューポートの高さを取得し、キーボードに押されてもレイアウトが崩れないようにする */
+    min-height: 86vh;
+}
+
+/* メインコンテンツ（説明部分）のラッパー */
+.contentWrapper {
+    flex-grow: 1;
+    /* ★★★ 残りの高さをすべて埋め尽くす魔法 ★★★ */
+
+    /* ★★★ 中身を上下左右中央に配置する魔法 ★★★ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 1rem;
+}
+
+.guideBox {
+    padding: 1.5rem;
+    background-color: #fef4f4;
+    /* 赤みがかった背景 */
+    border: 1px solid #fecdcd;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 390px;
+    margin: 1.2rem auto;
+}
+
+.guideBox p {
+    margin: 0.5rem 0;
+}
+
+.opposite {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.agree {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* 賛成（赤） */
+
+.disagree {
+    color: #3498db;
+    font-weight: bold;
+}
+
+/* 反対（青） */
+
+.guideSubText {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.formContainer {
+    flex-grow: 1;
+    /* 残りの高さをすべて使う */
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    min-width: 390px;
+    margin: 0 auto;
+}
+
+.textarea {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 1rem;
+    resize: none;
+    /* サイズ変更を無効化 */
+}
+
+.submitButton {
+    margin-top: 1rem;
+    padding: 1rem;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background-color: #2ecc71;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submitButton:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* モーダル関連のスタイル */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modalContent h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+}
+
+.confirmText {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.modalCancel,
+.modalConfirm {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+    max-width: 150px;
+}
+
+.modalCancel:hover,
+.modalConfirm:hover {
+    opacity: 0.8;
+}
+
+.modalCancel {
+    background: #bdc3c7;
+    color: white;
+}
+
+.modalConfirm {
+    background: #2ecc71;
+    color: white;
+}

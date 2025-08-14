@@ -49,3 +49,24 @@ class Participate(models.Model):
         db_table = "participate"
         # 同じユーザーが同じ部屋に複数参加できないように制約を設ける
         unique_together = ('user', 'room')
+
+# コメントモデル
+class Comment(models.Model):
+    comment_text = models.TextField("コメント文")
+    post_date = models.DateTimeField("投稿日時", auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="comments")
+
+    class Meta:
+        db_table = "comment"
+        ordering = ['post_date']
+
+# 既読管理モデル
+class CommentReadStatus(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    last_read_timestamp = models.DateTimeField("最終既読時間", auto_now=True)
+
+    class Meta:
+        db_table = "comment_read_status"
+        unique_together = ('sender', 'room')

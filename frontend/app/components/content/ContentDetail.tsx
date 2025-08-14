@@ -2,20 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import styles from '../../css/Debates.module.css';
+import {DebateDetailData } from '@/app/types/debate';
 
-// 詳細APIから受け取る型
-export interface DebateDetailData {
-  id: number;
-  room_name: string;
-  room_start: string;
-  room_end: string;
-  theme: {
-    id: number;
-    theme_title: string;
-    theme_detail: string;
-  };
-  // 他にもcreator情報など
-}
+
 
 interface Props {
   debateDetail: DebateDetailData | null;
@@ -26,7 +15,9 @@ export default function ContentDetail({ debateDetail, isLoading }: Props) {
   const router = useRouter();
   
   // TODO: ユーザーの参加状況を取得するAPIを後で作成する
-  const isParticipating = false; // 仮のフラグ
+  const isParticipating = debateDetail?.is_participating; // 仮のフラグ
+  console.log(isParticipating);
+  console.log(`参加状況: ${isParticipating ? '参加中' : '未参加'}`);
 
   if (isLoading) {
     return <div>読み込み中...</div>;

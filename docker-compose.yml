@@ -11,6 +11,11 @@ services:
       - postgres_data:/var/lib/postgresql/data #データの保存場所
     restart: always #自動再起動
 
+  redis:
+    image: "redis:alpine"
+    container_name: hanten_redis
+    restart: always
+
   # サービス②：バックエンド (Django)
   backend:
     build: ./backend # ./backendディレクトリにあるDockerfileを使って、コンテナを自作する
@@ -23,9 +28,10 @@ services:
       - ./backend:/app # 手元のソースコードの変更が、コンテナに即反映されるようにする
     command: > #起動時に実行するコマンド
       sh -c "python manage.py migrate &&
-             uvicorn Hanten.asgi:application --host 0.0.0.0 --port 8000 --reload"
+             daphne -b 0.0.0.0 -p 8000 Hanten.asgi:application"
     depends_on:
       - db
+      - redis # backendサービスが起動する前に、dbとredisサービスを起動する
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 

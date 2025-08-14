@@ -8,7 +8,7 @@ import styles from '../../css/Navigation.module.css';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
 
   // ユーザー情報がなければ何も表示しない
   if (!user) {
@@ -23,6 +23,11 @@ export default function Navigation() {
     { name: '履歴', href: `/users/${user.username}/history` },
     { name: 'プロフィール', href: `/users/${user.username}` },
   ];
+
+  if (!isLoaded || !user) {
+    // ローディング中のスケルトンUIなどを表示すると、さらに親切です
+    return <nav className={styles.navContainer}></nav>;
+  }
   return (
     <nav className={styles.navContainer}>
       {navLinks.map((link) => {

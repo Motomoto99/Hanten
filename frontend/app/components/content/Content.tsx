@@ -10,6 +10,7 @@ export interface Debate {
   room_end: string;
   theme_title: string;
   participant_count: number; // 参加者数
+  is_participating: boolean; // ユーザーが参加中かどうか
 }
 
 interface Props {

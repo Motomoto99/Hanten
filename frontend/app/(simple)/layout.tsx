@@ -14,14 +14,14 @@ export default function RootAuthLayout({
     return (
         <>
             <header className='header'>
-                <Link href="/" className='hanten-logo'>
+                <Link href="/debates" className='hanten-logo'>
                     Hanten
                 </Link>
                 {/* 右側のボタンをまとめるdiv */}
                 <div className="header-actions">
                 </div>
             </header>
-            <main className="main-content">
+            <main className="simple-main-content">
                 {children}
             </main>
             <Footer />

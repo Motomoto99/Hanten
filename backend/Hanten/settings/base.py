@@ -135,3 +135,21 @@ ALLOWED_PARTIES = [
     "https://hanten-psi.vercel.app", # Vercelの本番URL
 ]
 
+if 'REDIS_URL' in os.environ:
+    # 本番環境（Redis）の設定
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+            },
+        },
+    }
+else:
+    # 開発環境（メモリ）の設定(仮)
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
+

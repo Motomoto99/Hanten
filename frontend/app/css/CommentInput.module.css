@@ -1,0 +1,89 @@
+.container {
+    display: flex;
+    align-items: flex-end;
+    /* ボタンとテキストエリアの下端を揃える */
+    padding: 0.75rem;
+    background-color: #f0f2f5;
+    border-top: 1px solid #ddd;
+}
+
+.textarea {
+    flex-grow: 1;
+    /* 横幅いっぱいに広がる */
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    resize: none;
+    /* ユーザーによるサイズ変更を禁止 */
+    overflow-y: auto;
+    /* 内容が増えたらスクロール */
+
+    /* ▼▼▼【ここからが高さ自動調整のキモです！】▼▼▼ */
+    min-height: 2.5rem;
+    /* 最小の高さ（padding含む） */
+    max-height: 10rem;
+    /* 最大の高さを指定（これ以上はスクロール） */
+    box-sizing: border-box;
+    line-height: 1.5;
+    max-width: 500px;
+    margin-left: auto;
+
+    /* スクロールバー全体のスタイル */
+    &::-webkit-scrollbar {
+        width: 8px;
+        /* スクロールバーの幅 */
+    }
+
+    /* スクロールバーの「つまみ」部分のスタイル */
+    &::-webkit-scrollbar-thumb {
+        background-color: #bdc3c7;
+        /* つまみの色 */
+        border-radius: 4px;
+        /* つまみを角丸に */
+    }
+
+    /* スクロールバーの背景（レール）部分のスタイル */
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+        /* 背景は透明に */
+    }
+}
+
+.sendButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0084ff;
+    /* LINE風の送信ボタンの色 */
+    border: none;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    margin-left: 0.75rem;
+    margin-bottom: 5px;
+    margin-right: auto;
+    cursor: pointer;
+    color: white;
+
+    /* ▼▼▼【表示・非表示のアニメーション】▼▼▼ */
+    transform: scale(0);
+    transform-origin: center;
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sendButton.visible {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.sendButton:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.sendButton svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}

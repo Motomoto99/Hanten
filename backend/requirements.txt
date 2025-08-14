@@ -15,8 +15,11 @@ requests
 psycopg2-binary
 
 # WebSocket(Django Channels)を動かすための部品
-#channels
+channels
+channels-redis # 本番環境ではこちらを推奨しますが、開発ではインメモリでOK
+daphne # ASGIサーバー
 uvicorn
+websockets
 
 gunicorn
 dj-database-url

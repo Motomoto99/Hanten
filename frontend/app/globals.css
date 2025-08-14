@@ -98,6 +98,26 @@
   background-color: #EEEEEE;
 }
 
+.simple-main-content{
+  margin:0 auto;
+  width: 100%;
+  /* 中央に寄せる */
+  margin: 0 auto;
+  /* ⑤ フッターを一番下に押しやる魔法 */
+  flex-grow: 1;
+  /* ② このエリア自体も、子供を操る魔法使いにする！ */
+  display: flex;
+  flex-direction: column;
+  /* 子供を縦に並べる */
+  background-color: #EEEEEE;
+}
+
+.sign{
+  max-width: 390px;
+  /* ④ 画面の中央に寄せる魔法 */
+  margin: 0 auto;
+}
+
 /* ClerkサインインのUI */
 .auth-container {
   height: 650px;

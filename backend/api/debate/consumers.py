@@ -2,6 +2,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from clerk_django.client import ClerkClient
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -18,10 +19,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             token = [p.split('=')[1] for p in query_string.split('&') if p.startswith('token=')][0]
             print("[CONNECT] トークンの抽出に成功。Clerkに検証を依頼します...")
 
-            clerk_service = ClerkService()
-            user_info = clerk_service.users.verify_token(token)
-            self.scope['clerk_user'] = user_info
-            print(f"[SUCCESS] WebSocket 認証成功: user_id={user_info.get('id')}")
+            clerk_client = ClerkClient()
+            payload = clerk_service.users.verify_token(token)
+            self.scope['clerk_user'] = payload
+            print(f"[SUCCESS] WebSocket 認証成功: user_id={payload.get('id')}")
 
         except Exception as e:
             print(f"[FATAL] WebSocket 認証中に致命的なエラー: {e}")
@@ -61,10 +62,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # ★★★ JSONとして読めないデータも、無視する ★★★
             return
             
-        message_content = data.get('message')
-        clerk_user_id = data.get('clerk_user_id')
+        clerk_user_id = self.scope['clerk_user'].get('sub')
+        message_content = json.loads(text_data).get('message')
 
-        # ★★★ 必要な情報が含まれていなければ、何もしない ★★★
         if not all([message_content, clerk_user_id]):
             return
 

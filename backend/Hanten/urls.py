@@ -58,10 +58,10 @@ def auth_test(request):
         
         # Clerkに「このトークンは本物か？」と問い合わせる
         clerk_client = ClerkClient()
-        user_info = clerk_client.sessions.verify_token(token)
+        payload = clerk_client.verify_token(token)
         
         # 成功すれば、勝利のメッセージを返す
-        return JsonResponse({"status": "ok", "user_id": user_info.get('id')})
+        return JsonResponse({"status": "ok", "user_id": payload.get('id')})
 
     except Exception as e:
         # 失敗すれば、その理由を正直に白状させる

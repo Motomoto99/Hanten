@@ -23,11 +23,9 @@ from django.http import JsonResponse
 import os
 from channels.layers import get_channel_layer
 import asyncio
+from clerk_django.services import ClerkService
 
 def health_check(request):
-    # ▼▼▼【ここが、すべての問題を解決する、プロの技です！】▼▼▼
-    # 通訳（redis）は、実際に必要になる、この関数の「中」で呼び出す！
-    # これで、アプリ起動時のエラーは、二度と起こりません。
     import redis
 
     redis_url = os.environ.get("REDIS_URL")

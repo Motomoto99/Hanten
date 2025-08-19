@@ -7,16 +7,25 @@ import os
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # asgi.pyのClerkAsyncAuthMiddlewareが、すでに認証を済ませてくれている
-        # 私たちは、その結果（身分証明書）を、ただ信じるだけ
-        if not hasattr(self.scope, 'clerk_user') or not self.scope['clerk_user']:
-            print("[ERROR] WebSocket 認証失敗: 身分証明書が見つかりません。")
+        try:
+            query_string = self.scope['query_string'].decode()
+            token = [p.split('=')[1] for p in query_string.split('&') if p.startswith('token=')][0]
+            
+            # ▼▼▼【これが、最後の、そして最も確実な呪文です！】▼▼▼
+            # 門番を呼び出す際に、直接、秘密の合言葉を渡す！
+            clerk_client = ClerkClient(secret_key=os.environ.get("CLERK_SECRET_KEY"))
+            
+            payload = clerk_client.verify_token(token)
+            
+            self.scope['clerk_user'] = payload 
+            print(f"[SUCCESS] WebSocket 認証成功: user_id={payload.get('sub')}")
+
+        except Exception as e:
+            print(f"[ERROR] WebSocket 認証失敗: {e}")
             await self.close()
             return
 
-        user_info = self.scope['clerk_user']
-        print(f"[SUCCESS] WebSocket 認証成功: user_id={user_info.get('sub')}")
-
+        # 部屋に参加する処理
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'chat_{self.room_id}'
 
@@ -35,33 +44,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # WebSocketでメッセージを受信
     async def receive(self, text_data):
-        # ★★★ 空のデータが来たら、何もしないで無視する ★★★
-        if not text_data:
-            return
-
         try:
-            data = json.loads(text_data)
-        except json.JSONDecodeError:
-            # ★★★ JSONとして読めないデータも、無視する ★★★
-            return
+            # 接続時に保証された、安全な身分証明書からユーザーIDを取得
+            clerk_user_id = self.scope['clerk_user'].get('sub')
+            message_content = json.loads(text_data).get('message')
+
+            if not all([message_content, clerk_user_id]):
+                return
             
-        clerk_user_id = self.scope['clerk_user'].get('sub')
-        message_content = json.loads(text_data).get('message')
+            new_message_data = await self.save_and_serialize_message(message_content, clerk_user_id)
 
-        if not all([message_content, clerk_user_id]):
-            return
-
-        # DBにメッセージを保存
-        new_message = await self.save_message(message_content, clerk_user_id)
-
-        # グループ内の全員にメッセージを送信
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': new_message
-            }
-        )
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': new_message_data
+                }
+            )
+        except Exception as e:
+            print(f"WebSocket receive error: {e}")
     
     # グループからメッセージを受信してWebSocketに送信
     async def chat_message(self, event):

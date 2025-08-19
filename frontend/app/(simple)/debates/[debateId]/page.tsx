@@ -76,22 +76,23 @@ export default function ChatPage() {
     }, [params.debateId, getToken]);
 
     useEffect(() => {
-        const createSocketUrl = async () => {
+        const generateUrl = async () => {
+            // getToken()は非同期なので、ちゃんと待ってあげる
             const token = await getToken();
-            const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
-            // ★★★ URLに、認証トークンを「チケット」として添付する ★★★
-            // setSocketUrl(`${baseUrl}/ws/debates/${debateId}/?token=${token}`);
-            setSocketUrl(`${baseUrl}/ws/debates/${debateId}/`);
+            if (token) {
+                const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
+                // URLに、認証トークンを「チケット」として添付する
+                setSocketUrl(`${baseUrl}/ws/debates/${debateId}/?token=${token}`);
+                console.log("WebSocket URLを生成しました:", `${baseUrl}/ws/debates/${debateId}/`);
+            }
         };
-        createSocketUrl();
+        generateUrl();
     }, [debateId, getToken]);
 
     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+        // socketUrlがnullの間は、接続を試みない
         shouldReconnect: (closeEvent) => true,
-        // socketUrlがまだ空の時は、接続を開始しない
-        onOpen: () => console.log('WebSocket connected'),
-        retryOnError: true,
-    });
+      });
 
     // サーバーから新しいメッセージが届くたびに、このuseEffectが実行される
     useEffect(() => {

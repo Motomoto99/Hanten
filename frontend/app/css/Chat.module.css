@@ -1,7 +1,7 @@
 .chatContainer {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 85dvh;
     /* 親のレイアウトに高さいっぱいで広がる */
 
     /* ★★★ モバイルのキーボード問題を解決するおまじない ★★★ */
@@ -16,9 +16,13 @@
     /* ★★★ 中身を上下左右中央に配置する魔法 ★★★ */
     display: flex;
     justify-content: center;
-    align-items: center;
 
-    padding: 1rem;
+    padding: 1rem 0px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #b5b5b585;
+
+    overflow-y: auto;
 }
 
 .commentList {
@@ -26,7 +30,9 @@
     /* ★★★ 残りの高さをすべて埋める魔法 ★★★ */
     overflow-y: auto;
     /* メッセージが溢れたらスクロール */
-    padding: 1rem;
+    /* メッセージが下から上に積まれていくように見せるためのトリック */
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 
@@ -82,14 +88,14 @@
 }
 
 .myCommentBubble {
-    background-color: #dcf8c6;
+    background-color: #DF90F5;
     padding: 0.75rem 1rem;
     border-radius: 18px;
     line-height: 1.5;
     word-wrap: break-word;
     border-top-right-radius: 4px;
     /* ★★★ この一行を追加！ ★★★ */
-    color: #303030;
+    color: #000000;
     /* 文字の色を、ちゃんと黒系の色に指定 */
 }
 
@@ -123,3 +129,38 @@
     /* メッセージが溢れたらスクロール */
     padding: 1rem;
 }
+
+.senderInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.positionTagOther {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    color: white;
+}
+
+.positionTagMy {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    color: white;
+    margin-left: auto;
+}
+
+.agree {
+    background-color: #e74c3c;
+}
+
+/* 賛成派のタグ色 */
+.disagree {
+    background-color: #3498db;
+}
+
+/* 反対派のタグ色 */

@@ -110,7 +110,15 @@ class ParticipateSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     # senderはユーザーIDだけでなく、ユーザー名なども含めて返す
     sender = UserSerializer(read_only=True, source='user')
+    position = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ['id', 'comment_text', 'post_date', 'sender']
+        fields = ['id', 'comment_text', 'post_date', 'sender', 'position']
+    def get_position(self, obj):
+        # メッセージ(obj)を送ったユーザーの、この部屋での立場を検索
+        try:
+            participation = Participate.objects.get(room=obj.room, user=obj.user)
+            return participation.get_position_display() # "賛成" or "反対"
+        except Participate.DoesNotExist:
+            return None

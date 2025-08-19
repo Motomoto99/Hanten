@@ -70,7 +70,7 @@ export default function DebateHeader({ debateId, side }: Props) {
   return (
     <>
       <header className={styles.debateHeader}>
-        <button onClick={() => router.back()} className={styles.backButton}>
+        <button onClick={() => router.push('/debates')} className={styles.backButton}>
           &lt;
         </button>
         <div className={styles.headerTitleClickable} onClick={openModal}>

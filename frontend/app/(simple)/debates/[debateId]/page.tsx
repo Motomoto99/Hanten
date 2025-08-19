@@ -5,27 +5,28 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import axios from 'axios';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+
 import DebateHeader from '@/app/components/chat/DebateHeader';
 import CommentInput from '@/app/components/chat/CommentInput';
 import { Message, DebateDetailData } from '@/app/types/debate';
 import CommentList from '@/app/components/chat/CommentList';
 import styles from '../../../css/Chat.module.css';
-// import MessageInput from '@/app/components/debates/MessageInput';
 // import DebateFinishedPopup from '@/app/components/debates/DebateFinishedPopup';
 
 
 export default function ChatPage() {
-    const params = useParams<{ debateId: string }>();
+    const params = useParams<{ debateId: string }>(); // paramsは、URLのパラメータを取得するためのもの
     const debateId = params.debateId;
-    const { user } = useUser();
-    const { getToken } = useAuth();
+    const router = useRouter(); // ルーティングを管理するためのフック
+    const { user } = useUser(); // Clerkから現在のユーザー情報を取得
+    const { getToken } = useAuth(); // Clerkからトークンを取得するためのフック
 
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [debateDetail, setDebateDetail] = useState<DebateDetailData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [content, setContent] = useState('');
-
-    const [lastReadTimestamp, setLastReadTimestamp] = useState<string | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]); // メッセージ一覧の状態を管理するためのuseStateフック
+    const [debateDetail, setDebateDetail] = useState<DebateDetailData | null>(null); // ディベートの詳細情報を管理するためのuseStateフック
+    const [isLoading, setIsLoading] = useState(true); // データの読み込み状態を管理するためのuseStateフック
+    
+    const [content, setContent] = useState(''); // コメント入力欄の内容を管理するためのuseStateフック
+    const [lastReadTimestamp, setLastReadTimestamp] = useState<string | null>(null); // 最後に読んだメッセージのタイムスタンプを管理するためのuseStateフック
 
     // 初回マウント時に、部屋情報（終了日時を含む）と過去のメッセージを取得
     useEffect(() => {
@@ -78,18 +79,21 @@ export default function ChatPage() {
     const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
         shouldReconnect: (closeEvent) => true, // 常に再接続を試みる
     });
+
     // サーバーから新しいメッセージが届くたびに、このuseEffectが実行される
     useEffect(() => {
+        console.log("新しいメッセージが届きました:", lastMessage);
         if (lastMessage !== null) {
             const data = JSON.parse(lastMessage.data);
             if (data.type === 'chat_message') {
                 setMessages((prevMessages) => [...prevMessages, data.message]);
             }
+            console.log("現在のメッセージ一覧:", messages);
         }
-    }, [lastMessage, setMessages]);
+    }, [lastMessage]);
 
 
-
+    // メッセージ送信処理
     const handleSendMessage = (content: string) => {
         if (user && readyState === ReadyState.OPEN) {
             const payload = {
@@ -99,6 +103,8 @@ export default function ChatPage() {
             // ▼▼▼【useWebSocket.sendMessage を、ただの sendMessage に修正】▼▼▼
             sendMessage(JSON.stringify(payload));
         }
+        console.log("メッセージ送信:", content);
+        setContent(''); // メッセージ送信後は入力欄をクリア
     }
 
     // 接続状態を文字列で表示（デバッグ用）
@@ -131,13 +137,13 @@ export default function ChatPage() {
     return (
         <div className={styles.chatContainer}>
             <DebateHeader debateId={debateId} side={debateDetail?.user_participation.position ?? null} />
-            <div className='commentEreaWrapper'>
+            <div className={styles.commentEreaWrapper}>
                 <CommentList messages={messages} />
             </div>
             <CommentInput
                 value={content}
                 onChange={setContent}
-                onSendMessage={sendMessage}
+                onSendMessage={handleSendMessage}
                 isLoading={isLoading}
                 placeholder={`${debateDetail?.user_participation.position === 'AGREE' ? '賛成' : '反対'}意見をここに入力...`}
             />

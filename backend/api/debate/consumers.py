@@ -2,7 +2,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-# from .models import Room, Message, User
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -25,10 +24,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # WebSocketでメッセージを受信
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        message_content = data['message']
-        clerk_user_id = data['clerk_user_id']
-        
+        # ★★★ 空のデータが来たら、何もしないで無視する ★★★
+        if not text_data:
+            return
+
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            # ★★★ JSONとして読めないデータも、無視する ★★★
+            return
+            
+        message_content = data.get('message')
+        clerk_user_id = data.get('clerk_user_id')
+
+        # ★★★ 必要な情報が含まれていなければ、何もしない ★★★
+        if not all([message_content, clerk_user_id]):
+            return
+
         # DBにメッセージを保存
         new_message = await self.save_message(message_content, clerk_user_id)
 
@@ -43,18 +55,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     # グループからメッセージを受信してWebSocketに送信
     async def chat_message(self, event):
-        message = event['message']
-        await self.send(text_data=json.dumps(message))
+        await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
     def save_message(self, content, clerk_user_id):
+        from .models import Room, Comment, User, Participate
+        from .serializers import CommentSerializer
+
         sender = User.objects.get(clerk_user_id=clerk_user_id)
         room = Room.objects.get(id=self.room_id)
-        message = Message.objects.create(room=room, sender=sender, content=content)
-        # 本来はシリアライザーを使うべきですが、簡潔にするため辞書を作成
-        return {
-            'id': message.id,
-            'sender': { 'user_name': sender.user_name },
-            'content': message.content,
-            'created_at': message.created_at.isoformat()
-        }
+        comment = Comment.objects.create(room=room, user=sender, comment_text=content)
+        
+        # シリアライザを使ってコメントをシリアライズ
+        serializer = CommentSerializer(comment)
+
+        return serializer.data

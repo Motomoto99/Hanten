@@ -16,8 +16,6 @@ export default function ContentDetail({ debateDetail, isLoading }: Props) {
   
   // TODO: ユーザーの参加状況を取得するAPIを後で作成する
   const isParticipating = debateDetail?.is_participating; // 仮のフラグ
-  console.log(isParticipating);
-  console.log(`参加状況: ${isParticipating ? '参加中' : '未参加'}`);
 
   if (isLoading) {
     return <div>読み込み中...</div>;

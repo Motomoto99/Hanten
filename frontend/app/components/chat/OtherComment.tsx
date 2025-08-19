@@ -5,11 +5,18 @@ import styles from '../../css/Chat.module.css';
 export default function OtherComment({ message }: { message: Message }) {
     return (
         <div className={`${styles.commentRow} ${styles.otherRow}`}>
-            <div className={styles.avatar}>{message.sender.user_name.charAt(0)}</div>
             <div className={styles.commentContent}>
-                <div className={styles.senderName}>{message.sender.user_name}</div>
+                <div className={styles.senderInfo}>
+                    <span className={styles.senderName}>{message.sender.user_name}</span>
+                    {/* ★★★ 立場を表示するタグを追加 ★★★ */}
+                    {message.position && (
+                        <span className={`${styles.positionTagOther} ${message.position === '賛成' ? styles.agree : styles.disagree}`}>
+                            {message.position}派
+                        </span>
+                    )}
+                </div>
                 <div className={styles.otherCommentBubble}>
-                    {message.content}
+                    {message.comment_text}
                 </div>
             </div>
         </div>

@@ -170,7 +170,7 @@ class MessageListAPIView(generics.ListAPIView):
         """
         URLから部屋IDを取得し、該当するコメントを投稿順に返す
         """
-        room_id = self.kwargs.get('pk')
+        room_id = self.kwargs.get('pk') # URLのパスから部屋IDを取得
         # CommentモデルのForeignKeyは 'user' なので、select_relatedで効率化
         return Comment.objects.filter(room_id=room_id).select_related('user')
 

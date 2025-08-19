@@ -7,8 +7,9 @@ export interface Message {
         user_name: string;
         clerk_user_id: string;
     };
-    content: string;
-    created_at: string;
+    position: string | null; // 参加者の立場（賛成・反対など）
+    comment_text: string;
+    post_date: string;
 }
 
 // 詳細APIから受け取る型

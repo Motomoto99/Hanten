@@ -3,6 +3,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from clerk_django.client import ClerkClient
+import os
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -19,8 +20,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             token = [p.split('=')[1] for p in query_string.split('&') if p.startswith('token=')][0]
             print("[CONNECT] トークンの抽出に成功。Clerkに検証を依頼します...")
 
-            clerk_client = ClerkClient()
-            payload = clerk_service.users.verify_token(token)
+            clerk_client = ClerkClient(secret_key=os.environ.get("CLERK_SECRET_KEY"))
+            payload = clerk_client.verify_token(token)
+            
             self.scope['clerk_user'] = payload
             print(f"[SUCCESS] WebSocket 認証成功: user_id={payload.get('id')}")
 

@@ -47,6 +47,7 @@ def health_check(request):
         "redis_status": redis_status,
         "redis_connection_ok": redis_connection_ok,
     })
+
 def auth_test(request):
     try:
         # ヘッダーから、テスト用のトークンを取り出す
@@ -56,9 +57,8 @@ def auth_test(request):
         
         token = auth_header.split(' ')[1]
         
-        # Clerkに「このトークンは本物か？」と問い合わせる
-        clerk_client = ClerkClient()
-        payload = clerk_client.verify_token(token)
+        clerk_client = ClerkClient(secret_key=os.environ.get("CLERK_SECRET_KEY"))
+         payload = clerk_client.verify_token(token)
         
         # 成功すれば、勝利のメッセージを返す
         return JsonResponse({"status": "ok", "user_id": payload.get('id')})

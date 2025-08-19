@@ -80,7 +80,8 @@ export default function ChatPage() {
             const token = await getToken();
             const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
             // ★★★ URLに、認証トークンを「チケット」として添付する ★★★
-            setSocketUrl(`${baseUrl}/ws/debates/${debateId}/?token=${token}`);
+            // setSocketUrl(`${baseUrl}/ws/debates/${debateId}/?token=${token}`);
+            setSocketUrl(`${baseUrl}/ws/debates/${debateId}/`);
         };
         createSocketUrl();
     }, [debateId, getToken]);

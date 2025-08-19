@@ -5,7 +5,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Hanten.settings')
 django_asgi_app = get_asgi_application()
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
+from channels.security.websocket import AllowedHostsOriginValidator # ★★★ 信頼できる訪問者リストをチェックする執事をインポート ★★★
 import api.debate.routing # これから作成するルーティングファイルをインポート
 
 

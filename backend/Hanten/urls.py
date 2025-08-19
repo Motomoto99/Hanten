@@ -16,14 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
 
-from django.http import JsonResponse
+
 import os
 from channels.layers import get_channel_layer
 import asyncio
-from clerk_django.client import ClerkClient
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from api.permissions.clerk import ClerkAuthenticated
 
 def health_check(request):
     import redis
@@ -48,24 +52,12 @@ def health_check(request):
         "redis_connection_ok": redis_connection_ok,
     })
 
+@api_view(['GET'])
+@permission_classes([ClerkAuthenticated]) # ← Clerkの門番が仕事をした後、この許可証でチェックする
 def auth_test(request):
-    try:
-        # ヘッダーから、テスト用のトークンを取り出す
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or 'Bearer ' not in auth_header:
-            return JsonResponse({"status": "error", "message": "Authorization header missing or invalid"}, status=401)
-        
-        token = auth_header.split(' ')[1]
-        
-        clerk_client = ClerkClient()
-        payload = clerk_client.verify_token(token)
-        
-        # 成功すれば、勝利のメッセージを返す
-        return JsonResponse({"status": "ok", "user_id": payload.get('id')})
-
-    except Exception as e:
-        # 失敗すれば、その理由を正直に白状させる
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    # この関数にたどり着けた、ということは、認証は成功している！
+    user_id = request.clerk_user.get('id')
+    return JsonResponse({"status": "ok", "message": "おめでとうございます！認証は完璧です！", "user_id": user_id})
 
 urlpatterns = [
     path('admin/', admin.site.urls),

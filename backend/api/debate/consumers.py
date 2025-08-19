@@ -7,43 +7,24 @@ import os
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("\n--- [CONNECT] WebSocket接続試行を検知 ---")
-        try:
-            query_string = self.scope['query_string'].decode()
-            print(f"[CONNECT] クエリ文字列: {query_string}")
-
-            if 'token=' not in query_string:
-                print("[ERROR] クエリに 'token' が見つかりません。")
-                await self.close()
-                return
-
-            token = [p.split('=')[1] for p in query_string.split('&') if p.startswith('token=')][0]
-            print("[CONNECT] トークンの抽出に成功。Clerkに検証を依頼します...")
-
-            clerk_client = ClerkClient()
-            payload = clerk_client.verify_token(token)
-
-            self.scope['clerk_user'] = payload
-            print(f"[SUCCESS] WebSocket 認証成功: user_id={payload.get('id')}")
-
-        except Exception as e:
-            print(f"[FATAL] WebSocket 認証中に致命的なエラー: {e}")
+        # asgi.pyのClerkAsyncAuthMiddlewareが、すでに認証を済ませてくれている
+        # 私たちは、その結果（身分証明書）を、ただ信じるだけ
+        if not hasattr(self.scope, 'clerk_user') or not self.scope['clerk_user']:
+            print("[ERROR] WebSocket 認証失敗: 身分証明書が見つかりません。")
             await self.close()
             return
-        
-        # 認証成功後、グループに参加
+
+        user_info = self.scope['clerk_user']
+        print(f"[SUCCESS] WebSocket 認証成功: user_id={user_info.get('sub')}")
+
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'chat_{self.room_id}'
-        
-        print(f"[CONNECT] Redisグループ ({self.room_group_name}) に参加します...")
+
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
-        print("[SUCCESS] Redisグループへの参加完了。")
-
         await self.accept()
-        print("--- [SUCCESS] WebSocket接続を完全に確立しました ---")
 
     async def disconnect(self, close_code):
         # グループから離脱

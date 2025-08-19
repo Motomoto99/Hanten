@@ -20,9 +20,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             token = [p.split('=')[1] for p in query_string.split('&') if p.startswith('token=')][0]
             print("[CONNECT] トークンの抽出に成功。Clerkに検証を依頼します...")
 
-            clerk_client = ClerkClient(secret_key=os.environ.get("CLERK_SECRET_KEY"))
+            clerk_client = ClerkClient()
             payload = clerk_client.verify_token(token)
-            
+
             self.scope['clerk_user'] = payload
             print(f"[SUCCESS] WebSocket 認証成功: user_id={payload.get('id')}")
 

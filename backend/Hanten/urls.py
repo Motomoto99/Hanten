@@ -25,16 +25,24 @@ from channels.layers import get_channel_layer
 import asyncio
 
 def health_check(request):
+    # ▼▼▼【ここが、すべての問題を解決する、プロの技です！】▼▼▼
+    # 通訳（redis）は、実際に必要になる、この関数の「中」で呼び出す！
+    # これで、アプリ起動時のエラーは、二度と起こりません。
+    import redis
+
     redis_url = os.environ.get("REDIS_URL")
     redis_status = "Not Configured"
     redis_connection_ok = False
-    try:
-        # 心臓部（channel_layer）に、ちゃんと呼吸（接続確認）ができるか、直接尋ねる！
-        await channel_layer.send("test-channel", {"type": "test.message"})
-        redis_status = "OK"
-        redis_connection_ok = True
-    except Exception as e:
-        redis_status = f"Failed: {str(e)}"
+
+    if redis_url:
+        try:
+            # 実際にRedisに接続を試みる
+            r = redis.from_url(redis_url)
+            r.ping()
+            redis_status = "OK"
+            redis_connection_ok = True
+        except Exception as e:
+            redis_status = f"Failed: {str(e)}"
     
     return JsonResponse({
         "django_status": "OK",

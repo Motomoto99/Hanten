@@ -49,6 +49,25 @@ def health_check(request):
         "redis_status": redis_status,
         "redis_connection_ok": redis_connection_ok,
     })
+def auth_test(request):
+    try:
+        # ヘッダーから、テスト用のトークンを取り出す
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or 'Bearer ' not in auth_header:
+            return JsonResponse({"status": "error", "message": "Authorization header missing or invalid"}, status=401)
+        
+        token = auth_header.split(' ')[1]
+        
+        # Clerkに「このトークンは本物か？」と問い合わせる
+        clerk_service = ClerkService()
+        user_info = clerk_service.users.verify_token(token)
+        
+        # 成功すれば、勝利のメッセージを返す
+        return JsonResponse({"status": "ok", "user_id": user_info.get('id')})
+
+    except Exception as e:
+        # 失敗すれば、その理由を正直に白状させる
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -59,6 +78,7 @@ urlpatterns = [
     path('api/debate/', include('api.debate.urls')),
     # path('api/messaging/', include('api.messaging.urls')),
     path('health/', health_check, name='health_check'),
+    path('auth-test/', auth_test, name='auth_test'), 
 ]
 
 if settings.DEBUG:

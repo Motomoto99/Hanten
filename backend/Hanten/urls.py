@@ -50,6 +50,7 @@ urlpatterns = [
     path('api/webhook/', include('api.webhook.urls')),
     path('api/debate/', include('api.debate.urls')),
     # path('api/messaging/', include('api.messaging.urls')),
+    path('health/', health_check, name='health_check'),
 ]
 
 if settings.DEBUG:

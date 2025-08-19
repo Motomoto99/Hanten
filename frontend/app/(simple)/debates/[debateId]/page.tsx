@@ -17,14 +17,15 @@ import styles from '../../../css/Chat.module.css';
 export default function ChatPage() {
     const params = useParams<{ debateId: string }>(); // paramsは、URLのパラメータを取得するためのもの
     const debateId = params.debateId;
-    const router = useRouter(); // ルーティングを管理するためのフック
+    const router = useRouter(); // Next.jsのルーターを使用して、ページ遷移を行うためのフック
     const { user } = useUser(); // Clerkから現在のユーザー情報を取得
     const { getToken } = useAuth(); // Clerkからトークンを取得するためのフック
+    const [socketUrl, setSocketUrl] = useState(''); // WebSocketのURLを管理するためのuseStateフック
 
     const [messages, setMessages] = useState<Message[]>([]); // メッセージ一覧の状態を管理するためのuseStateフック
     const [debateDetail, setDebateDetail] = useState<DebateDetailData | null>(null); // ディベートの詳細情報を管理するためのuseStateフック
     const [isLoading, setIsLoading] = useState(true); // データの読み込み状態を管理するためのuseStateフック
-    
+
     const [content, setContent] = useState(''); // コメント入力欄の内容を管理するためのuseStateフック
     const [lastReadTimestamp, setLastReadTimestamp] = useState<string | null>(null); // 最後に読んだメッセージのタイムスタンプを管理するためのuseStateフック
 
@@ -74,10 +75,21 @@ export default function ChatPage() {
         fetchInitialData();
     }, [params.debateId, getToken]);
 
-    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://locahost:8000';
-    const wsUrl = `${baseUrl}/ws/debates/${debateId}/`;
-    const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
-        shouldReconnect: (closeEvent) => true, // 常に再接続を試みる
+    useEffect(() => {
+        const createSocketUrl = async () => {
+            const token = await getToken();
+            const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
+            // ★★★ URLに、認証トークンを「チケット」として添付する ★★★
+            setSocketUrl(`${baseUrl}/ws/debates/${debateId}/?token=${token}`);
+        };
+        createSocketUrl();
+    }, [debateId, getToken]);
+
+    const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+        shouldReconnect: (closeEvent) => true,
+        // socketUrlがまだ空の時は、接続を開始しない
+        onOpen: () => console.log('WebSocket connected'),
+        retryOnError: true,
     });
 
     // サーバーから新しいメッセージが届くたびに、このuseEffectが実行される

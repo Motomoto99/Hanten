@@ -7,6 +7,7 @@ django_asgi_app = get_asgi_application()
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator # ★★★ 信頼できる訪問者リストをチェックする執事をインポート ★★★
 import api.debate.routing # これから作成するルーティングファイルをインポート
+from clerk_django.middlewares.websockets import ClerkAsyncAuthMiddleware
 
 class DebuggingMiddleware:
     """
@@ -35,7 +36,7 @@ application = ProtocolTypeRouter({
     "http": django_asgi_app,
     # ★★★ 特別な訪問者（WebSocket）は、まず執事（AllowedHostsOriginValidator）がチェックし、
     # その後、専用の入口（URLRouter）へ案内する ★★★
-    "websocket": AllowedHostsOriginValidator(
+    "websocket": ClerkAsyncAuthMiddleware(
         URLRouter(
             api.debate.routing.websocket_urlpatterns
         )

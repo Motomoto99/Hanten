@@ -58,7 +58,7 @@ def auth_test(request):
         token = auth_header.split(' ')[1]
         
         clerk_client = ClerkClient(secret_key=os.environ.get("CLERK_SECRET_KEY"))
-         payload = clerk_client.verify_token(token)
+        payload = clerk_client.verify_token(token)
         
         # 成功すれば、勝利のメッセージを返す
         return JsonResponse({"status": "ok", "user_id": payload.get('id')})

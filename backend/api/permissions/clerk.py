@@ -8,6 +8,6 @@ class ClerkAuthenticated(BasePermission):
     message = "認証されていません。有効なClerkのトークンを提供してください。"
 
     def has_permission(self, request, view):
-        # Clerkのミドルウェアが追加してくれた`request.auth`が存在し、
-        # かつ、中身が空っぽ(None)でなければ、アクセスを許可します。
-        return hasattr(request, 'auth') and request.auth is not None
+        # ▼▼▼【ここを、'auth'から'clerk_user'に、正しく書き換えます！】▼▼▼
+        # Clerkのミドルウェアが追加してくれた`request.clerk_user`が存在すれば、アクセスを許可します。
+        return hasattr(request, 'clerk_user') and request.clerk_user is not None

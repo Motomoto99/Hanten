@@ -5,30 +5,14 @@ from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # ▼▼▼【ここからが、新しい身元確認のロジックです！】▼▼▼
-        try:
-            # URLに添付された「チケット（トークン）」を取り出す
-            query_string = self.scope['query_string'].decode()
-            token = [p.split('=')[1] for p in query_string.split('&') if p.startswith('token=')][0]
-            
-            # Clerkに「このチケットは本物か？」と問い合わせる
-            clerk_service = ClerkService()
-            user_info = clerk_service.users.verify_token(token)
-            
-            # ★★★ 身元が確認できたので、ユーザー情報をscopeに保存する ★★★
-            self.scope['clerk_user'] = user_info
-            print(f"[SUCCESS] WebSocket 認証成功: user_id={user_info.get('id')}")
-
-        except Exception as e:
-            # チケットがない、偽物、期限切れなど、何か問題があれば接続を拒否
-            print(f"[ERROR] WebSocket 認証失敗: {e}")
-            await self.close()
-            return
-
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'chat_{self.room_id}'
 
-        await self.channel_layer.group_add(...)
+        # グループに参加
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -49,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except json.JSONDecodeError:
             # ★★★ JSONとして読めないデータも、無視する ★★★
             return
-        
+            
         message_content = data.get('message')
         clerk_user_id = data.get('clerk_user_id')
 

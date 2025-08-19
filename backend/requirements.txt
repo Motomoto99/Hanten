@@ -21,7 +21,6 @@ daphne # ASGIサーバー
 uvicorn
 websockets
 
-redis
 
 gunicorn
 dj-database-url

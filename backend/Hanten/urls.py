@@ -57,8 +57,8 @@ def auth_test(request):
         token = auth_header.split(' ')[1]
         
         # Clerkに「このトークンは本物か？」と問い合わせる
-        clerk_service = ClerkService()
-        user_info = clerk_service.users.verify_token(token)
+        clerk_client = ClerkClient()
+        user_info = clerk_client.users.verify_token(token)
         
         # 成功すれば、勝利のメッセージを返す
         return JsonResponse({"status": "ok", "user_id": user_info.get('id')})

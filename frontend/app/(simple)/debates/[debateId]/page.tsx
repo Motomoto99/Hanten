@@ -74,7 +74,7 @@ export default function ChatPage() {
         fetchInitialData();
     }, [params.debateId, getToken]);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'ws://locahost:8000';
+    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://locahost:8000';
     const wsUrl = `${baseUrl}/ws/debates/${debateId}/`;
     const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
         shouldReconnect: (closeEvent) => true, // 常に再接続を試みる

@@ -23,7 +23,7 @@ from django.http import JsonResponse
 import os
 from channels.layers import get_channel_layer
 import asyncio
-from clerk_django.services import ClerkService
+from clerk_django.client import ClerkClient
 
 def health_check(request):
     import redis

@@ -75,15 +75,17 @@ export default function ChatPage() {
         fetchInitialData();
     }, [params.debateId, getToken]);
 
+    let wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}`;
     // useEffect(() => {
-    //     const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
-    //     // URLに、認証トークンを「チケット」として添付する
-    //     setSocketUrl(`${baseUrl}/ws/debates/${debateId}/`);
-    //     console.log("WebSocket URLを生成しました:", `${baseUrl}/ws/debates/${debateId}/`);
+    //     if (process.env.NEXT_PUBLIC_WS_URL) {
+    //         console.log("本番環境のWebSocket URLを生成します:", `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}`);
+    //         wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}`
+    //     } else {
+    //         console.log("ローカルのWebSocket URLを使用します:", `ws://localhost:8000/ws/debates/${debateId}/`);
+    //         wsUrl = `ws://localhost:8000/ws/debates/${debateId}/`;
+    //     }
+    // }, [getToken]);
 
-    // }, [debateId, getToken]);
-
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}` || `ws://localhost:8000/ws/debates/${debateId}/`;
     const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
         // socketUrlがnullの間は、接続を試みない
         shouldReconnect: (closeEvent) => true,

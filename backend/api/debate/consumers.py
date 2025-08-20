@@ -4,6 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from clerk_django.client import ClerkClient
 import os
+from channels.generic.websocket import WebsocketConsumer
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -78,3 +79,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         serializer = CommentSerializer(comment)
 
         return serializer.data
+
+#動作確認用
+class EchoConsumer(WebsocketConsumer):
+    def connect(self):
+        # 接続が来たら、無条件で受け入れる！
+        self.accept()
+        print("--- [ECHO] オウム返しサーバー：接続を受け入れました ---")
+
+    def disconnect(self, close_code):
+        print("--- [ECHO] オウム返しサーバー：切断されました ---")
+
+    def receive(self, text_data):
+        # メッセージを受け取ったら、そのまま送り返す！
+        print(f"--- [ECHO] オウム返しサーバー：メッセージ '{text_data}' を受信。そのまま返します ---")
+        self.send(text_data=f"オウム返し: {text_data}")

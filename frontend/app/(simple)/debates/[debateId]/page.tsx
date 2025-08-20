@@ -83,7 +83,7 @@ export default function ChatPage() {
 
     // }, [debateId, getToken]);
 
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000/ws/debates/${debateId}/`;
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}` || `ws://localhost:8000/ws/debates/${debateId}/`;
     const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
         // socketUrlがnullの間は、接続を試みない
         shouldReconnect: (closeEvent) => true,

@@ -7,9 +7,10 @@ import styles from '../../css/Chat.module.css';
 
 export default function CommentList({ messages }: { messages: Message[] }) {
     const { user } = useUser();
+    const reversedMessages = [...messages].reverse();
     return (
         <div className={styles.commentList}>
-            {messages.map(msg =>
+            {reversedMessages.map(msg =>
                 user?.id === msg.sender.clerk_user_id
                     ? <MyComment key={msg.id} message={msg} />
                     : <OtherComment key={msg.id} message={msg} />

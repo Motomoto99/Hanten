@@ -31,8 +31,8 @@
     overflow-y: auto;
     /* メッセージが溢れたらスクロール */
     /* メッセージが下から上に積まれていくように見せるためのトリック */
-    display: flex;
-    flex-direction: column-reverse;
+    /* display: flex;
+    flex-direction: column-reverse; */
 }
 
 

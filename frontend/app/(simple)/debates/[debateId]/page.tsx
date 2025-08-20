@@ -75,24 +75,19 @@ export default function ChatPage() {
         fetchInitialData();
     }, [params.debateId, getToken]);
 
-    useEffect(() => {
-        const generateUrl = async () => {
-            // getToken()は非同期なので、ちゃんと待ってあげる
-            const token = await getToken();
-            if (token) {
-                const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
-                // URLに、認証トークンを「チケット」として添付する
-                setSocketUrl(`${baseUrl}/ws/debates/${debateId}/?token=${token}`);
-                console.log("WebSocket URLを生成しました:", `${baseUrl}/ws/debates/${debateId}/`);
-            }
-        };
-        generateUrl();
-    }, [debateId, getToken]);
+    // useEffect(() => {
+    //     const baseUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000`;
+    //     // URLに、認証トークンを「チケット」として添付する
+    //     setSocketUrl(`${baseUrl}/ws/debates/${debateId}/`);
+    //     console.log("WebSocket URLを生成しました:", `${baseUrl}/ws/debates/${debateId}/`);
 
-    const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    // }, [debateId, getToken]);
+
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://localhost:8000/ws/debates/${debateId}/`;
+    const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
         // socketUrlがnullの間は、接続を試みない
         shouldReconnect: (closeEvent) => true,
-      });
+    });
 
     // サーバーから新しいメッセージが届くたびに、このuseEffectが実行される
     useEffect(() => {

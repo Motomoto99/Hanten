@@ -117,11 +117,12 @@ class FirstMessageAPIView(generics.CreateAPIView):
             # ==================== 監視カメラ 4: トランザクション開始 ====================
             print("[INFO] データベースへの書き込み処理を開始します...")
             with transaction.atomic():
+                actual_position= 'DISAGREE' if position.upper() == 'AGREE' else 'AGREE'
                 # 参加者として登録（既に参加済みの場合は何もしない）
                 participation, created = Participate.objects.get_or_create(
                     user=user,
                     room=room,
-                    defaults={'position': position.upper()}
+                    defaults={'position': actual_position.upper()}
                 )
                 if created:
                     print(f"[SUCCESS] 参加者として新規登録完了。")

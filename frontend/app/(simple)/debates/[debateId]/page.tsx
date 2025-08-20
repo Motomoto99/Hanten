@@ -20,7 +20,7 @@ export default function ChatPage() {
     const router = useRouter(); // Next.jsのルーターを使用して、ページ遷移を行うためのフック
     const { user } = useUser(); // Clerkから現在のユーザー情報を取得
     const { getToken } = useAuth(); // Clerkからトークンを取得するためのフック
-    const [socketUrl, setSocketUrl] = useState(''); // WebSocketのURLを管理するためのuseStateフック
+    const [socketUrl, setSocketUrl] = useState<string | null>(null);
 
     const [messages, setMessages] = useState<Message[]>([]); // メッセージ一覧の状態を管理するためのuseStateフック
     const [debateDetail, setDebateDetail] = useState<DebateDetailData | null>(null); // ディベートの詳細情報を管理するためのuseStateフック
@@ -75,20 +75,35 @@ export default function ChatPage() {
         fetchInitialData();
     }, [params.debateId, getToken]);
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}/`;
-    // let wsUrl = `ws://localhost:8000/ws/debates/${debateId}/`;
+    // const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}/`;
+    // const wsUrl = `ws://localhost:8000/ws/debates/${debateId}/`;
 
-    // useEffect(() => {
-    //     if (process.env.NEXT_PUBLIC_WS_URL) {
-    //         console.log("本番環境のWebSocket URLを生成します:", `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}`);
-    //         wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/ws/debates/${debateId}/`
-    //     } else {
-    //         console.log("ローカルのWebSocket URLを使用します:", `ws://localhost:8000/ws/debates/${debateId}/`);
-    //         wsUrl = `ws://localhost:8000/ws/debates/${debateId}/`;
-    //     }
-    // }, [getToken]);
+    useEffect(() => {
+        // この関数は、初回の描画後と、debateIdかgetTokenが変わった時だけ実行される
+        const generateUrl = async () => {
+          // 本番用の認証に備え、Clerkのトークンも取得しておきます
+          const token = await getToken();
+          if (token) {
+            // 今が本番(production)か、開発(development)かを判断
+            const isProduction = process.env.NODE_ENV === 'production';
+    
+            const baseUrl = isProduction 
+              ? process.env.NEXT_PUBLIC_WS_URL // 本番環境のURL
+              : 'ws://localhost:8000';         // 開発環境のURL
+              
+            const newSocketUrl = `${baseUrl}/ws/debates/${debateId}/`;
+            
+            // 3. 生成したURLを、「記憶ノート」に書き込み、Reactに「覚えておいて！」と伝えます
+            setSocketUrl(newSocketUrl);
+            console.log("WebSocket URLを生成しました:", newSocketUrl);
+          }
+        };
+        
+        generateUrl();
+    
+      }, [debateId, getToken]); // ← これが「きっかけ」のリストです
 
-    const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl, {
+    const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
         // socketUrlがnullの間は、接続を試みない
         shouldReconnect: (closeEvent) => true,
     });

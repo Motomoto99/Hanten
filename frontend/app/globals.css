@@ -42,7 +42,7 @@
   /* 角を丸くする設定 */
   border-radius: 8px;
   /* 内側の余白 */
-  padding: 5px 24px 13px 24px;
+  padding: 10px 24px 13px 24px;
   /* 外側の余白 */
   /* フォントの設定 */
   font-family: 'Noto Sans JP', sans-serif;
@@ -110,6 +110,7 @@
   flex-direction: column;
   /* 子供を縦に並べる */
   background-color: #EEEEEE;
+  flex-grow: 1
 }
 
 .sign{

@@ -75,6 +75,17 @@ export default function page() {
     <div className={styles.container}>
       <h1 className={styles.title}>新しいディベート部屋を作成</h1>
 
+      {/* テーマ選択 */}
+      <div className={styles.formGroup}>
+        <label>テーマ</label>
+        <div className={styles.themeSelector} onClick={() => setIsThemeModalOpen(true)}>
+          {selectedTheme ? selectedTheme.theme_title : '議論テーマを選択する'}
+        </div>
+        {selectedTheme && (
+          <p className={styles.themeDetail}>{selectedTheme.theme_detail}</p>
+        )}
+      </div>
+
       {/* 部屋名入力 */}
       <div className={styles.formGroup}>
         <label>ディベート部屋名</label>
@@ -100,17 +111,6 @@ export default function page() {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* テーマ選択 */}
-      <div className={styles.formGroup}>
-        <label>テーマ</label>
-        <div className={styles.themeSelector} onClick={() => setIsThemeModalOpen(true)}>
-          {selectedTheme ? selectedTheme.theme_title : '議論テーマを選択する'}
-        </div>
-        {selectedTheme && (
-          <p className={styles.themeDetail}>{selectedTheme.theme_detail}</p>
-        )}
       </div>
 
       {/* 作成ボタン */}

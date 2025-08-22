@@ -66,7 +66,6 @@ urlpatterns = [
     path('api/user/', include('api.user.urls')),
     path('api/webhook/', include('api.webhook.urls')),
     path('api/debate/', include('api.debate.urls')),
-    # path('api/messaging/', include('api.messaging.urls')),
     path('health/', health_check, name='health_check'),
     path('auth-test/', auth_test, name='auth_test'), 
 ]

@@ -17,7 +17,6 @@
     display: flex;
     justify-content: center;
 
-    padding: 1rem 0px;
     max-width: 1000px;
     margin: 0 auto;
     background-color: #b5b5b585;
@@ -31,8 +30,8 @@
     overflow-y: auto;
     /* メッセージが溢れたらスクロール */
     /* メッセージが下から上に積まれていくように見せるためのトリック */
-    /* display: flex;
-    flex-direction: column-reverse; */
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 

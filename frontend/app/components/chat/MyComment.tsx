@@ -4,7 +4,7 @@ import styles from '../../css/Chat.module.css';
 
 export default function MyComment({ message }: { message: Message }) {
     return (
-        <div className={`${styles.commentRow} ${styles.myRow}`}>
+        <div id={`comment-${message.id}`} className={`${styles.commentRow} ${styles.myRow}`}>
             <div className={styles.commentContent}>
                 <div className={styles.senderInfo}>
                     {/* ★★★ 立場を表示するタグを追加 ★★★ */}

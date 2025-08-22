@@ -63,10 +63,10 @@ class Comment(models.Model):
 
 # 既読管理モデル
 class CommentReadStatus(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    last_read_timestamp = models.DateTimeField("最終既読時間", auto_now=True)
+    last_read_comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = "comment_read_status"
-        unique_together = ('sender', 'room')
+        unique_together = ('user', 'room',)

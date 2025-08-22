@@ -4,7 +4,7 @@ import styles from '../../css/Chat.module.css';
 
 export default function OtherComment({ message }: { message: Message }) {
     return (
-        <div className={`${styles.commentRow} ${styles.otherRow}`}>
+        <div id={`comment-${message.id}`} className={`${styles.commentRow} ${styles.otherRow}`}>
             <div className={styles.commentContent}>
                 <div className={styles.senderInfo}>
                     <span className={styles.senderName}>{message.sender.user_name}</span>

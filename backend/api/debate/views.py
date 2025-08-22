@@ -165,52 +165,57 @@ class MessageListAPIView(generics.ListAPIView):
     指定されたディベート部屋のメッセージ一覧を、ページネーションして返す、ただそれだけのAPI
     """
     serializer_class = CommentSerializer
-    pagination_class = StandardResultsSetPagination
+    # pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        """
-        URLから部屋IDを取得し、該当するコメントを投稿順に返す
-        """
-        room_id = self.kwargs.get('pk') # URLのパスから部屋IDを取得
-        # CommentモデルのForeignKeyは 'user' なので、select_relatedで効率化
+        room_id = self.kwargs.get('pk')
+        # CommentモデルのForeignKeyは 'user' なので、'user' をselect_relatedします
         return Comment.objects.filter(room_id=room_id).select_related('user')
+
+    def list(self, request, *args, **kwargs):
+        # まず、すべてのメッセージを取得します
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        
+        # 次に、このユーザーの「栞」を探します
+        last_read_status = None
+        if hasattr(request, 'clerk_user') and request.clerk_user.get('id'):
+            try:
+                user = User.objects.get(clerk_user_id=request.clerk_user.get('id'))
+                last_read_status = CommentReadStatus.objects.filter(
+                    room_id=self.kwargs.get('pk'),
+                    user=user
+                ).first()
+            except User.DoesNotExist:
+                pass
+
+        # 最後に、メッセージリストと「栞」を、一つの綺麗な箱に入れて返します
+        response_data = {
+            'results': serializer.data,
+            'last_read_comment_id': last_read_status.last_read_comment_id if last_read_status else None
+        }
+        return Response(response_data)
+
 
 # ★★★ 既読状態を更新するためのAPIビュー ★★★ まだできてない
 class ReadStatusUpdateAPIView(APIView):
     serializer_class = CommentSerializer
     pagination_class = StandardResultsSetPagination # 既存のページネーションを再利用
 
-    # 取得するメッセージのクエリセットを定義
-    def get_queryset(self):
-        room_id = self.kwargs.get('pk')
-        return Comment.objects.filter(room_id=room_id).select_related('user')
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        
-        # ★★★ ユーザーの最終既読時間を取得して、レスポンスに追加 ★★★
-        last_read_status = CommentReadStatus.objects.filter(
-            room_id=self.kwargs.get('pk'),
-            sender__clerk_user_id=request.clerk_user.get('id')
-        ).first()
-
-        paginated_response = self.get_paginated_response(serializer.data)
-        paginated_response.data['last_read_timestamp'] = last_read_status.last_read_timestamp if last_read_status else None
-        return paginated_response
-
     def post(self, request, pk):
+        last_read_comment_id = request.data.get('last_read_comment_id')
+        if not last_read_comment_id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         try:
             user = User.objects.get(clerk_user_id=request.clerk_user.get('id'))
-            room = Room.objects.get(id=pk)
-
-            # 既読状態を更新または作成
+            
+            # ★★★ ここも「user」に統一！ ★★★
             CommentReadStatus.objects.update_or_create(
-                sender=user,
-                room=room,
-                defaults={'last_read_timestamp': timezone.now()}
+                user=user,
+                room_id=pk,
+                defaults={'last_read_comment_id': last_read_comment_id}
             )
             return Response(status=status.HTTP_200_OK)
-        except (User.DoesNotExist, Room.DoesNotExist):
+        except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

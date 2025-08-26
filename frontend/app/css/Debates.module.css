@@ -164,6 +164,20 @@
     max-width: 150px;
 }
 
+.btnBack {
+    background-color: #999999;
+    color: white;
+    width: 100%;
+    max-width: 150px;
+}
+
+.btnConfirm {
+    background-color: #2ecc71;
+    color: white;
+    width: 100%;
+    max-width: 150px;
+}
+
 /* 参加人数の色分け */
 .participantInfo {
     font-size: 0.9rem;
@@ -250,4 +264,16 @@
     text-overflow: ellipsis;
     /* 長いタイトルは「...」で省略 */
     margin: 0;
+}
+
+/* 終了画面 */
+.finishedTitle{
+   font-size: 1.8rem;
+   padding-bottom: 1rem;
+   border-bottom: 2px solid #705c7848;
+}
+.finishedContainer{
+    padding:1rem;
+    max-width: 500px;;
+    margin:0 auto;
 }

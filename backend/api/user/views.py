@@ -2,11 +2,18 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework import generics
 
-from .models import User
+from api.user.models import User
+from api.debate.models import Room, Participate, Comment
 from .serializers import UserSerializer
+from api.debate.serializers import RoomListSerializer
+from .serializers import DebateEvaluationSerializer
+from django.db.models import Count
+from django.db.models import Exists, OuterRef, Count, Value,BooleanField
+from django.utils import timezone
 
-# Create your views here.
+
 class Me(APIView):
     """
     ログイン中のユーザー情報を取得する
@@ -75,3 +82,71 @@ class Me(APIView):
         user.save()
 
         return Response(status=status.HTTP_200_OK)
+
+# ★★★ ユーザーが参加したディベート一覧を返すAPI ★★★
+class ParticipatedDebateListView(generics.ListAPIView):
+    serializer_class = RoomListSerializer
+
+    def get_queryset(self):
+        try:
+            # まず、このリクエストを送ってきた「本当の」ユーザーを探し出す
+            user = User.objects.get(clerk_user_id=self.request.clerk_user.get('id'))
+        except User.DoesNotExist:
+            # もしユーザーが見つからなければ、空っぽのリストを返す
+            return Room.objects.none()
+        
+        # ★★★ 1. まず、すべての部屋の、本当の参加人数を数える ★★★
+        all_rooms_with_count = Room.objects.select_related('theme').annotate(
+            participant_count=Count('participate', distinct=True),
+            is_participating=Value(True, output_field=BooleanField())
+        )
+
+        # ★★★ 2. その後で、このユーザーが参加している部屋だけを、選び出す ★★★
+        queryset = all_rooms_with_count.filter(participants=user).order_by('-room_start')
+
+        # ステータス（開催中か終了済みか）でフィルタリング
+        status = self.request.query_params.get('status', 'ongoing')
+        now = timezone.now()
+        if status == 'ongoing':
+            return queryset.filter(room_end__gt=now)
+        elif status == 'finished':
+            return queryset.filter(room_end__lte=now)
+        return queryset
+
+class DebateEvaluationView(APIView):
+
+    def get(self, request, debateId):
+        try:
+            user = User.objects.get(clerk_user_id=request.clerk_user.get('id'))
+            room = Room.objects.get(id=debateId)
+
+            # --- 1. コメント関連の集計 ---
+            all_comments_in_room = Comment.objects.filter(room=room)
+            total_comment_count = all_comments_in_room.count()
+            my_comment_count = all_comments_in_room.filter(user=user).count()
+            
+            my_comment_percentage = (my_comment_count / total_comment_count * 100) if total_comment_count > 0 else 0
+
+            # --- 2. 立場の比率の集計 ---
+            participants_in_room = Participate.objects.filter(room=room)
+            total_participants = participants_in_room.count()
+            agree_count = participants_in_room.filter(position='AGREE').count()
+            
+            agree_percentage = (agree_count / total_participants * 100) if total_participants > 0 else 0
+            disagree_percentage = 100 - agree_percentage
+            
+            # --- 3. データをまとめる ---
+            data = {
+                'my_comment_count': my_comment_count,
+                'my_comment_percentage': round(my_comment_percentage, 1),
+                'total_comment_count': total_comment_count,
+                'agree_percentage': round(agree_percentage, 1),
+                'disagree_percentage': round(disagree_percentage, 1),
+            }
+
+            serializer = DebateEvaluationSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            return Response(serializer.data)
+
+        except (User.DoesNotExist, Room.DoesNotExist):
+            return Response(status=status.HTTP_404_NOT_FOUND)

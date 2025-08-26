@@ -8,4 +8,5 @@ urlpatterns = [
     path('debates/<int:pk>/messages/', views.MessageListAPIView.as_view(), name='message-list'),
     path('debates/<int:pk>/messages/post', views.FirstMessageAPIView.as_view(), name='first-message'),
     path('debates/<int:pk>/read_status/', views.ReadStatusUpdateAPIView.as_view(), name='read-status-update'),
+    path('debates/<int:pk>/feedback/', views.AIFeedbackView.as_view(), name='ai-feedback'),
 ]

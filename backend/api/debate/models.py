@@ -70,3 +70,23 @@ class CommentReadStatus(models.Model):
     class Meta:
         db_table = "comment_read_status"
         unique_together = ('user', 'room',)
+
+# ★★★ AIによる議論の「要約」を保存するモデル ★★★
+class AIFeedbackSummary(models.Model):
+    room = models.OneToOneField(Room, on_delete=models.CASCADE, related_name="summary")
+    summary_text = models.TextField("要約文")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "ai_feedback_summary"
+
+# ★★★ AIによる個人への「フィードバック」を保存するモデル ★★★
+class AIFeedbackPrivate(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="private_feedbacks")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="private_feedbacks")
+    feedback_text = models.TextField("フィードバック文")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "ai_feedback_private"
+        unique_together = ('room', 'user') # 部屋とユーザーの組み合わせは一度だけ

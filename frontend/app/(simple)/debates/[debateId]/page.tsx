@@ -10,6 +10,7 @@ import DebateHeader from '@/app/components/chat/DebateHeader';
 import CommentInput from '@/app/components/chat/CommentInput';
 import { Message, DebateDetailData } from '@/app/types/debate';
 import CommentList from '@/app/components/chat/CommentList';
+import stylesDetail from '../../../css/Debates.module.css';
 import styles from '../../../css/Chat.module.css';
 // import DebateFinishedPopup from '@/app/components/debates/DebateFinishedPopup';
 
@@ -29,7 +30,7 @@ export default function ChatPage() {
     const commentListRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter(); // Next.jsのルーターを使用して、ページ遷移を行うためのフック
 
-    
+
     //WebSocketのURLを生成するためのuseEffectフック
     useEffect(() => {
         // この関数は、初回の描画後と、debateIdかgetTokenが変わった時だけ実行される
@@ -219,10 +220,40 @@ export default function ChatPage() {
 
     if (isDebateFinished) {
         return (
-            <div>
-                {/* ★★★ 終了表示ポップアップコンポーネント ★★★ */}
-                {/* <DebateFinishedPopup debateDetail={debateDetail} /> */}
-                <h1>このディベートは終了しました</h1>
+            <div className={styles.chatContainer}>
+
+                <div className={stylesDetail.finishedContainer}>
+
+
+                    {/* ディベート詳細を再利用して表示 */}
+                    <div className={stylesDetail.detailContainer}>
+                        <h2 className={stylesDetail.finishedTitle}>ディベートは終了しました</h2>
+                        <div className={stylesDetail.dateRange}>
+                            {new Date(debateDetail.room_start).toLocaleDateString()} 〜 {new Date(debateDetail.room_end).toLocaleDateString()}
+                        </div>
+                        <h2 className={stylesDetail.roomNameDetail}>{debateDetail.room_name}</h2>
+                        <h1 className={stylesDetail.themeTitle}>{debateDetail.theme.theme_title}</h1>
+                        <p className={stylesDetail.themeDetail}>{debateDetail.theme.theme_detail}</p>
+                    </div>
+
+                    {/* 終了後のボタン */}
+                    <div className={stylesDetail.buttonArea}>
+                        {debateDetail.is_participating ? (
+                            <>
+                                <button onClick={() => router.push('/debates')} className={`${stylesDetail.btn} ${stylesDetail.btnBack}`}>
+                                    一覧に戻る
+                                </button>
+                                <button onClick={() => router.push(`/users/${user?.username}/history/${debateDetail.id}`)} className={`${stylesDetail.btn} ${stylesDetail.btnConfirm}`}>
+                                    評価を確認
+                                </button>
+                            </>
+                        ) : (
+                            <button onClick={() => router.push('/debates')} className={`${stylesDetail.btn} ${stylesDetail.btnBackFull}`}>
+                                一覧に戻る
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
         );
     }

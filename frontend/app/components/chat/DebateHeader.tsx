@@ -64,8 +64,8 @@ export default function DebateHeader({ debateId, side }: Props) {
     );
   }
 
-  const oppositeSide = side === 'agree' ? '反対' : '賛成';
-  const oppositeSideClass = side === 'agree' ? stylesSide.disagree : stylesSide.agree;
+  const oppositeSide = side === 'agree' ? '賛成' : '反対';
+  const oppositeSideClass = side === 'agree' ? stylesSide.agree : stylesSide.disagree;
 
   return (
     <>

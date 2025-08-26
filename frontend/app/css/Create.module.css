@@ -1,6 +1,7 @@
 .container {
   padding: 1rem;
-  max-width: 390px;
+  max-width: 500px;
+  min-width: 390px;
   margin: 0 auto;
 }
 
@@ -9,6 +10,8 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #705c7848;
 }
 
 .formGroup {

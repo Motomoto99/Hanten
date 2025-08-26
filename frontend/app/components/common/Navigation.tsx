@@ -10,6 +10,8 @@ export default function Navigation() {
   const pathname = usePathname();
   const { user, isLoaded } = useUser();
 
+  const userId = user?.id;
+
   // ユーザー情報がなければ何も表示しない
   if (!user) {
     return null;
@@ -20,8 +22,8 @@ export default function Navigation() {
 
   const navLinks = [
     { name: 'トレンド', href: '/debates' },
-    { name: '履歴', href: `/users/${user.username}/history` },
-    { name: 'プロフィール', href: `/users/${user.username}` },
+    { name: '履歴', href: `/users/${userId}/history` },
+    { name: 'プロフィール', href: `/users/${userId}` },
   ];
 
   if (!isLoaded || !user) {

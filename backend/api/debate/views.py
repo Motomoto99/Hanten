@@ -2,7 +2,6 @@ from django.shortcuts import render
 
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import Room
 from .serializers import RoomListSerializer, RoomDetailSerializer,RoomCreateSerializer,CommentSerializer, ThemeSerializer
 from django.db.models import Count # Countをインポート
 from api.pagination import StandardResultsSetPagination # 作成したページネーションをインポート
@@ -12,14 +11,15 @@ from asgiref.sync import async_to_sync
 from django.utils import timezone
 from datetime import timedelta
 from django.db import transaction
-from .models import Room, Theme, User,Participate,Comment, CommentReadStatus
+from .models import Room, Theme, User,Participate,Comment, CommentReadStatus, AIFeedbackPrivate, AIFeedbackSummary
 from django.db.models import Exists, OuterRef, Count, Value,BooleanField
+from django.http import JsonResponse
 # from api.permissions.clerk import ClerkAuthenticated
 
+# ディベート部屋の一覧を取得・作成するAPIビュー
 class DebateListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = RoomListSerializer
     # permission_classes = [ClerkAuthenticated]
-    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         """
@@ -56,6 +56,7 @@ class DebateListCreateAPIView(generics.ListCreateAPIView):
         # ... (以降のフィルタリングロジックは変更なし)
         status = self.request.query_params.get('status', 'ongoing')
         now = timezone.now()
+        print(f"--- [DEBUG] サーバーの現在時刻 (UTC): {now} ---")
 
         if status == 'ongoing':
             return queryset.filter(room_end__gt=now)
@@ -219,3 +220,59 @@ class ReadStatusUpdateAPIView(APIView):
             return Response(status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+# ★★★ AIフィードバックを生成・取得するためのAPI ★★★
+class AIFeedbackView(APIView):
+
+    def get(self, request, pk):
+        try:
+            user = User.objects.get(clerk_user_id=request.clerk_user.get('id'))
+            feedback = AIFeedbackPrivate.objects.get(room_id=pk, user=user)
+            return Response({"feedback": feedback.feedback_text})
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except AIFeedbackPrivate.DoesNotExist:
+            # フィードバックがまだ存在しない場合は、空のレスポンスを返す
+            return Response({"feedback": None})
+
+
+    def post(self, request, pk):
+        try:
+            user = User.objects.get(clerk_user_id=request.clerk_user.get('id'))
+            room = Room.objects.get(id=pk)
+
+            # --- このユーザーへのフィードバックが既に存在するか確認 ---
+            existing_feedback = AIFeedbackPrivate.objects.filter(room=room, user=user).first()
+            if existing_feedback:
+                return Response({"feedback": existing_feedback.feedback_text})
+
+            # --- 議論全体の要約が存在するか確認、なければ生成 ---
+            summary, created = AIFeedbackSummary.objects.get_or_create(
+                room=room,
+                defaults={'summary_text': self.generate_summary(room)}
+            )
+
+            # --- 個人へのフィードバックを生成 ---
+            feedback_text = self.generate_private_feedback(summary, user, room)
+            
+            # --- DBに保存して、フロントに返す ---
+            AIFeedbackPrivate.objects.create(room=room, user=user, feedback_text=feedback_text)
+            
+            return Response({"feedback": feedback_text}, status=status.HTTP_201_CREATED)
+
+        except (User.DoesNotExist, Room.DoesNotExist):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def generate_summary(self, room):
+        # ★★★ ここに、OpenAI APIを呼び出すロジックを実装します ★★★
+        # all_comments = Comment.objects.filter(room=room)
+        # prompt = "以下のコメントを要約してください..."
+        print("★★★ AI: 要約を生成中... ★★★")
+        return "これは、AIによって生成された、ディベート全体の要約です。"
+
+    def generate_private_feedback(self, summary, user, room):
+        # ★★★ ここに、OpenAI APIを呼び出すロジックを実装します ★★★
+        # user_comments = Comment.objects.filter(room=room, user=user)
+        # prompt = f"要約は「{summary.summary_text}」です。このユーザーのコメントを基に..."
+        print(f"★★★ AI: {user.user_name}さんへのフィードバックを生成中... ★★★")
+        return "これは、AIによって生成された、あなただけのプライベートなフィードバックです。"

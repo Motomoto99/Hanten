@@ -119,3 +119,26 @@
     color: white;
     margin:30px 0px 50px 0px;
 }
+
+
+.toggleButton{
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background-color: #3498db;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.chatHistoryContainer {
+    margin-top: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    max-height: 400px;
+    /* 高さに上限を設けて、スクロールできるようにします */
+    overflow-y: auto;
+    background-color: #b5b5b585;
+}

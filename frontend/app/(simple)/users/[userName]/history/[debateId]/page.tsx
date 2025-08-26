@@ -8,6 +8,8 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import axios from 'axios';
 import DebateHeader from '@/app/components/chat/DebateHeader';
 import { DebateDetailData } from '@/app/types/debate';
+import CommentList from '@/app/components/chat/CommentList';
+import { Message } from '@/app/types/debate';
 import styles from '@/app/css/Feedback.module.css';
 
 // APIから受け取る成績表の型
@@ -33,6 +35,10 @@ export default function EvaluationPage() {
     const [isAILoading, setIsAILoading] = useState(false);
     const [evaluation, setEvaluation] = useState<EvaluationData | null>(null);
     const [hasFeedback, setHasFeedback] = useState(false);
+
+    const [showChat, setShowChat] = useState(false);
+    const [chatMessages, setChatMessages] = useState<Message[]>([]);
+    const [isChatLoading, setIsChatLoading] = useState(false);
 
     const userId = user?.id;
 
@@ -87,6 +93,34 @@ export default function EvaluationPage() {
             setFeedback("エラーが発生しました。");
         } finally {
             setIsAILoading(false);
+        }
+    };
+
+    // ★★★ トグルが押された時に、チャット履歴を取得する関数 ★★★
+    const handleFetchChat = async () => {
+        // もし、もうチャットを開いているなら、何もしない
+        if (showChat) {
+            setShowChat(false); // トグルなので、もう一度押したら閉じます
+            return;
+        }
+
+        setIsChatLoading(true);
+        if(chatMessages){
+            setShowChat(true); // 既に取得済みなら、すぐに表示
+            setIsChatLoading(false);
+            return;
+        }
+        try {
+            const token = await getToken();
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/debate/debates/${debateId}/messages/`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setChatMessages(res.data.results);
+            setShowChat(true); // データを取得できたら、表示を許可
+        } catch (error) {
+            console.error("チャット履歴の取得に失敗", error);
+        } finally {
+            setIsChatLoading(false);
         }
     };
 
@@ -153,6 +187,19 @@ export default function EvaluationPage() {
                         </button>
                     </div>
                 )}
+
+                <div className={styles.card}>
+                    <button onClick={handleFetchChat} className={styles.toggleButton}>
+                        {showChat ? '議論を隠す' : '議論の内容を見る'}
+                    </button>
+                    {isChatLoading && <div>読み込み中...</div>}
+                    {showChat && (
+                        <div className={styles.chatHistoryContainer}>
+                            <CommentList messages={chatMessages}  />
+                        </div>
+                    )}
+                </div>
+
             </div>
         </div>
     );

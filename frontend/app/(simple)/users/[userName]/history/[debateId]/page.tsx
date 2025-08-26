@@ -105,11 +105,6 @@ export default function EvaluationPage() {
         }
 
         setIsChatLoading(true);
-        if(chatMessages){
-            setShowChat(true); // 既に取得済みなら、すぐに表示
-            setIsChatLoading(false);
-            return;
-        }
         try {
             const token = await getToken();
             const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/debate/debates/${debateId}/messages/`, {

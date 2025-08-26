@@ -67,11 +67,12 @@ export default function FirstAddComponent() {
   };
 
   const oppositeSide = side === 'agree' ? '反対' : '賛成';
+  const position = side === 'agree' ? 'DISAGREE' : 'AGREE';
   const oppositeSideClass = side === 'agree' ? styles.disagree : styles.agree;
 
   return (
     <div className={styles.pageContainer}>
-      <DebateHeader debateId={debateId} side={side} />
+      <DebateHeader debateId={debateId} side={position} />
 
       <div className={styles.contentWrapper}>
         <div className={styles.guideBox}>

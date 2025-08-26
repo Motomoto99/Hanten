@@ -138,10 +138,11 @@ export default function EvaluationPage() {
                 </div>
 
                 <hr />
+                <br></br>
 
 
                 {hasFeedback ? (
-                    <div>
+                    <div className={styles.card}>
                         <h2>AIからのフィードバック</h2>
                         <p style={{ whiteSpace: 'pre-wrap' }}>{feedback}</p>
                     </div>

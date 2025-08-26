@@ -107,7 +107,6 @@
 .actionButtons{
     display: flex;
     justify-content: center;
-    margin-top: 1.5rem;
 }
 .aiButton {
     padding: 0.8rem 2rem;

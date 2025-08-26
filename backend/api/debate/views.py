@@ -14,6 +14,8 @@ from django.db import transaction
 from .models import Room, Theme, User,Participate,Comment, CommentReadStatus, AIFeedbackPrivate, AIFeedbackSummary
 from django.db.models import Exists, OuterRef, Count, Value,BooleanField
 from django.http import JsonResponse
+import openai
+from django.conf import settings
 # from api.permissions.clerk import ClerkAuthenticated
 
 # ディベート部屋の一覧を取得・作成するAPIビュー
@@ -221,6 +223,7 @@ class ReadStatusUpdateAPIView(APIView):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 # ★★★ AIフィードバックを生成・取得するためのAPI ★★★
 class AIFeedbackView(APIView):
 
@@ -249,11 +252,11 @@ class AIFeedbackView(APIView):
             # --- 議論全体の要約が存在するか確認、なければ生成 ---
             summary, created = AIFeedbackSummary.objects.get_or_create(
                 room=room,
-                defaults={'summary_text': self.generate_summary(room)}
+                defaults={'summary_text': self._generate_summary(room)}
             )
 
             # --- 個人へのフィードバックを生成 ---
-            feedback_text = self.generate_private_feedback(summary, user, room)
+            feedback_text = self._generate_private_feedback(summary, user, room)
             
             # --- DBに保存して、フロントに返す ---
             AIFeedbackPrivate.objects.create(room=room, user=user, feedback_text=feedback_text)
@@ -263,16 +266,87 @@ class AIFeedbackView(APIView):
         except (User.DoesNotExist, Room.DoesNotExist):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def generate_summary(self, room):
-        # ★★★ ここに、OpenAI APIを呼び出すロジックを実装します ★★★
-        # all_comments = Comment.objects.filter(room=room)
-        # prompt = "以下のコメントを要約してください..."
+    def _generate_summary(self, room):
         print("★★★ AI: 要約を生成中... ★★★")
-        return "これは、AIによって生成された、ディベート全体の要約です。"
+        # ★★★ 1. まず、この部屋の「参加者名簿」を、すべて取得します ★★★
+        participants = Participate.objects.filter(room=room).select_related('user')
+        # ★★★ 2. 誰がどの立場か、一瞬で分かる「早見表」を作っておきます ★★★
+        positions_map = {p.user.id: p.get_position_display() for p in participants}
 
-    def generate_private_feedback(self, summary, user, room):
-        # ★★★ ここに、OpenAI APIを呼び出すロジックを実装します ★★★
-        # user_comments = Comment.objects.filter(room=room, user=user)
-        # prompt = f"要約は「{summary.summary_text}」です。このユーザーのコメントを基に..."
+        # 3. 部屋のすべてのコメントを取得
+        comments = Comment.objects.filter(room=room).select_related('user').order_by('post_date')
+
+        # 4. 早見表を見ながら、議論のテキストを組み立てる
+        discussion_text = "\n".join([
+            f"- {c.user.user_name} ({positions_map.get(c.user.id, '立場不明')}派): {c.comment_text}" 
+            for c in comments
+        ])
+        
+        # 2. AIへの「お願い文（プロンプト）」を作成
+        prompt = f"""
+        以下のディベートの議論内容を300字程度で要約してください。議論の流れが分かるように、できるだけ具体的に書いてください。
+
+        # 議論のテーマ
+        {room.theme.theme_title}
+
+        # 議論の内容
+        {discussion_text}
+        """
+
+        try:
+            print("★★★ AI: OpenAI APIに要約を依頼中... ★★★")
+            # 3. OpenAI APIに、要約を依頼する
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo", # または "gpt-4" など
+                messages=[
+                    {"role": "system", "content": "あなたは優秀な議事録作成アシスタントです。"},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            print("★★★ AI: 要約の生成完了 ★★★")
+            summary = response.choices[0].message.content
+            return summary
+        except Exception as e:
+            print(f"OpenAI API (要約)エラー: {e}")
+            return "AIによる要約の生成に失敗しました。"
+
+
+    def _generate_private_feedback(self, summary, user, room):
         print(f"★★★ AI: {user.user_name}さんへのフィードバックを生成中... ★★★")
-        return "これは、AIによって生成された、あなただけのプライベートなフィードバックです。"
+        # 1. このユーザーのコメントと、参加立場を取得
+        user_comments = Comment.objects.filter(room=room, user=user).order_by('post_date')
+        user_discussion_text = "\n".join([f"- {c.comment_text}" for c in user_comments])
+        user_position = Participate.objects.get(room=room, user=user).get_position_display()
+
+        # 2. AIへの、個人向けの「お願い文（プロンプト）」を作成
+        prompt = f"""
+        あなたは、ロジカルシンキングを教える、優れたディベートコーチです。
+        以下の情報を基に、このユーザーの議論の進め方について、具体的で、役に立つ、優しいフィードバックを200字程度で作成してください。
+        なお、相手の人格や価値観そのものを否定したり馬鹿にした入りするような発言がないかチェックし、あれば、自分と違う視点を理解し、自分の考えを深めることを促してください。
+
+        # 議論全体の要約
+        {summary.summary_text}
+
+        # このユーザーが参加した立場
+        {user_position}派
+
+        # このユーザーが投稿した、すべてのコメント
+        {user_discussion_text}
+        """
+
+        try:
+            print("★★★ AI: OpenAI APIにフィードバックを依頼中... ★★★")
+            # 3. OpenAI APIに、フィードバックを依頼する
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "あなたは優秀なディベートコーチです。"},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            print("★★★ AI: フィードバックの生成完了 ★★★")
+            feedback = response.choices[0].message.content
+            return feedback
+        except Exception as e:
+            print(f"OpenAI API (フィードバック)エラー: {e}")
+            return "AIによるフィードバックの生成に失敗しました。"

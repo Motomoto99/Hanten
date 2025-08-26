@@ -33,3 +33,5 @@ svix
 cryptography
 
 # Django Channlesみたいなやつ入れてないけど大丈夫なのかな
+
+openai

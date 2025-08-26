@@ -1,31 +1,28 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
-import { useAuth, useUser } from '@clerk/nextjs';
 import ContentList from '@/app/components/content/ContentList';
-import ContentDetail from '@/app/components/content/ContentDetail';
-import { DebateDetailData } from '@/app/types/debate';
 import { Debate } from '@/app/components/content/Content';
-import { UserProfile } from '@/app/types/user'; // ユーザー情報の型をインポート
-import styles from '@/app/css/Debates.module.css';
+import styles from '@/app/css/Profile.module.css'; // この画面専用のCSS
+import { DebateDetailData } from '@/app/types/debate';
+import ContentDetail from '@/app/components/content/ContentDetail';
 
-type Tab = 'ongoing' | 'finished';
+// プロフィール情報の型
+interface ProfileData {
+  user_name: string;
+  participated_count: number;
+}
 
-function DebatesHistoryComopnent() {
-  const router = useRouter();
+export default function ProfilePage() {
+  const params = useParams<{ userName: string }>();
   const { getToken } = useAuth();
-  const { isLoaded, isSignedIn } = useUser();
 
-  //状態管理（State）を整理・統合
-  const [pageLoading, setPageLoading] = useState(true); // ページ全体のローディング状態を管理
-  const [activeTab, setActiveTab] = useState<Tab>('ongoing');
-  const [debates, setDebates] = useState<{ [key in Tab]: Debate[] }>({ ongoing: [], finished: [] });
-  const [tabLoading, setTabLoading] = useState(false); // タブごとのデータ読み込み
-  // データを取得したタブを記録
-  const [fetchedTabs, setFetchedTabs] = useState<Set<Tab>>(new Set());
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [createdDebates, setCreatedDebates] = useState<Debate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // モーダル関連のState
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,72 +30,29 @@ function DebatesHistoryComopnent() {
   const [debateDetail, setDebateDetail] = useState<DebateDetailData | null>(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-
-  // --- APIからデータを取得する関数（useCallbackで最適化）---
-  const fetchDebates = useCallback(async (tab: Tab) => {
-    // 既に読み込み中、または次のページがない場合は何もしない
-    setTabLoading(true);
-    try {
-      const token = await getToken();
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/participate_debates/`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { status: tab },
-      });
-      setDebates(prev => ({
-        ...prev,
-        [tab]: response.data
-      }));
-      setFetchedTabs(prev => new Set(prev).add(tab));
-      console.log(`${tab}ディベートの取得に成功:`, response.data);
-    } catch (error) {
-      console.error(`${tab}ディベートの取得に失敗:`, error);
-    } finally {
-      setTabLoading(false);
-    }
-  }, [getToken]);
-
-
-  // 1. 初回マウント時にユーザー状態をチェックし、チュートリアルへのリダイレクトを判断
   useEffect(() => {
-    if (!isLoaded) return; // Clerkの準備ができるまで待つ
-
-    if (!isSignedIn) {
-      router.push('/sign-in');
-      return;
-    }
-
-    const checkUserStatus = async () => {
+    const fetchProfileData = async () => {
       try {
         const token = await getToken();
-        const response = await axios.get<UserProfile>(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (response.data.first_flag) {
-          router.push('/tutorial');
-        } else {
-          // チュートリアルが不要なら、最初のデータを取得開始
-          if (!fetchedTabs.has('ongoing')) {
-            await fetchDebates('ongoing');
-          }
-          setPageLoading(false);
-        }
+        // プロフィール情報と、作成したディベート一覧を、同時に取得！
+        const [profileRes, createdDebatesRes] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/profile/`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me/created_debates/`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+        setProfile(profileRes.data);
+        setCreatedDebates(createdDebatesRes.data);
       } catch (error) {
-        console.error("ユーザー情報の取得に失敗しました:", error);
-        // エラー時はトップページなどに戻す
-        router.push('/');
+        console.error("プロフィール情報の取得に失敗", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    checkUserStatus();
-  }, [isLoaded, isSignedIn, getToken, router, fetchDebates, fetchedTabs]);
-
-  // 2. タブが切り替わった時に、データが空ならデータを取得
-  useEffect(() => {
-    if (!pageLoading && !fetchedTabs.has(activeTab)) {
-      fetchDebates(activeTab);
-    }
-  }, [activeTab, pageLoading, fetchDebates, fetchedTabs]);
+    fetchProfileData();
+  }, [getToken]);
 
   // 4. 個別ディベートの詳細を取得
   useEffect(() => {
@@ -122,47 +76,36 @@ function DebatesHistoryComopnent() {
     }
   }, [selectedDebateId, getToken]);
 
-
-  const handleDebateClick = (debateId: number) => {
-    setSelectedDebateId(debateId);
-    setIsModalOpen(true);
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedDebateId(null);
     setDebateDetail(null);
   };
 
-  if (pageLoading || !isLoaded) {
-    return <div className={styles.center}>読み込み中...</div>;
-  }
+  const handleDebateClick = (debateId: number) => {
+    setSelectedDebateId(debateId);
+    setIsModalOpen(true);
+  };
+
+  if (isLoading) return <div>読み込み中...</div>;
+  if (!profile) return <div>プロフィールを取得できませんでした。</div>;
 
   return (
-    <div>
-      <div className={styles.tabContainer}>
-        <button
-          className={activeTab === 'ongoing' ? styles.activeTab : styles.tab}
-          onClick={() => setActiveTab('ongoing')}
-        >
-          参加中
-        </button>
-        <button
-          className={activeTab === 'finished' ? styles.activeTab : styles.tab}
-          onClick={() => setActiveTab('finished')}
-        >
-          終了済み
-        </button>
+    <div className={styles.container}>
+      <div className={styles.profileHeader}>
+        <h1 className={styles.userName}>{profile.user_name}</h1>
+        <div className={styles.stats}>
+          参加ディベート数: {profile.participated_count}
+        </div>
       </div>
 
-      <ContentList
-        debates={debates[activeTab]}
-        onDebateClick={handleDebateClick}
-      />
-      {tabLoading && <div className={styles.center}>読み込み中...</div>}
-      {!tabLoading && debates[activeTab].length > 0 && (
-        <div className={styles.center}>最後のディベートです</div>
-      )}
+      <div className={styles.debatesSection}>
+        <h2 className={styles.title}>作成したディベート（{createdDebates.length}）</h2>
+        <ContentList
+          debates={createdDebates}
+          onDebateClick={handleDebateClick}
+        />
+      </div>
 
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={closeModal}>
@@ -172,13 +115,5 @@ function DebatesHistoryComopnent() {
         </div>
       )}
     </div>
-  );
-}
-
-export default function DebateHistoryPage() {
-  return (
-    <Suspense fallback={<div className={styles.center}>ページを準備中...</div>}>
-      <DebatesHistoryComopnent />
-    </Suspense>
   );
 }

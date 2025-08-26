@@ -22,3 +22,15 @@ class DebateEvaluationSerializer(serializers.Serializer):
     total_comment_count = serializers.IntegerField()
     agree_percentage = serializers.FloatField()
     disagree_percentage = serializers.FloatField()
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    ユーザープロフィール画面用の、特別なシリアライザー
+    """
+    # 参加したディベートの数を、ここに追加します
+    participated_count = serializers.IntegerField()
+
+    class Meta:
+        model = User
+        # 必要な情報だけを、厳選して渡します
+        fields = ['user_name', 'participated_count']

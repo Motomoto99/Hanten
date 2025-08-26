@@ -8,7 +8,7 @@ from api.user.models import User
 from api.debate.models import Room, Participate, Comment
 from .serializers import UserSerializer
 from api.debate.serializers import RoomListSerializer
-from .serializers import DebateEvaluationSerializer
+from .serializers import DebateEvaluationSerializer,UserProfileSerializer
 from django.db.models import Count
 from django.db.models import Exists, OuterRef, Count, Value,BooleanField
 from django.utils import timezone
@@ -150,3 +150,31 @@ class DebateEvaluationView(APIView):
 
         except (User.DoesNotExist, Room.DoesNotExist):
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+# ★★★ ユーザープロフィール情報を返す、一人目の秘書 ★★★
+class UserProfileView(APIView):
+
+    def get(self, request):
+        try:
+            user = User.objects.annotate(
+                # Userモデルに、参加したディベートの数を一時的にくっつけます
+                participated_count=Count('participating_rooms')
+            ).get(clerk_user_id=request.clerk_user.get('id'))
+            
+            serializer = UserProfileSerializer(user)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+# ★★★ ユーザーが作成したディベート一覧を返す、二人目の秘書 ★★★
+class CreatedDebateListView(generics.ListAPIView):
+    serializer_class = RoomListSerializer
+
+    def get_queryset(self):
+        # このリクエストを送ってきたユーザーを探し出し…
+        user = User.objects.get(clerk_user_id=self.request.clerk_user.get('id'))
+        # その人が「作成者」になっている部屋だけを、絞り込んで返すのです
+        return Room.objects.filter(creator=user).select_related('theme').annotate(
+            participant_count=Count('participate', distinct=True),
+            is_participating=Value(True, output_field=BooleanField()) # 自分が作った部屋は、当然「参加済み」ですわ
+        ).order_by('-room_start')

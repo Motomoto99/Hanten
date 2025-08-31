@@ -47,14 +47,6 @@ services:
     depends_on:
       - backend # backendサービスが起動してから、frontendを起動する
 
-  adminer:
-    image: adminer
-    container_name: hanten_adminer
-    restart: always
-    ports:
-      - "8080:8080" # パソコンの8080番ポートを、Adminerに繋ぐ
-    depends_on:
-      - db
 
 volumes:
   postgres_data:

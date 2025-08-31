@@ -1,17 +1,7 @@
 'use client';
 
 import styles from '../../css/Debates.module.css';
-
-// APIから受け取るディベート部屋の型を定義
-export interface Debate {
-  id: number;
-  room_name: string;
-  room_start: string;
-  room_end: string;
-  theme_title: string;
-  participant_count: number; // 参加者数
-  is_participating: boolean; // ユーザーが参加中かどうか
-}
+import { Debate } from '@/app/types/debate';
 
 interface Props {
   debate: Debate;
@@ -25,14 +15,19 @@ export default function Content({ debate, onClick }: Props) {
 
   return (
     <div className={styles.contentCard} onClick={onClick}>
-      <div className={styles.dateRange}>{startDate} 〜 {endDate}</div>
+      <div className={styles.date}>
+        <div className={styles.dateRange}>{startDate} 〜 {endDate}</div>
+        {debate.has_unread_messages && debate.is_participating && (
+          <div className={styles.unreadIndicator}>新着コメントあり</div>
+        )}
+      </div>
       <h3 className={styles.roomName}>{debate.room_name}</h3>
       <div className={styles.participantInfo}>
         <span className={styles.count}>
           {debate.participant_count}人
         </span>
         <span className={styles.participant}>
-        {isFinished ? 'が参加しました' : 'が参加中'}
+          {isFinished ? 'が参加しました' : 'が参加中'}
         </span>
       </div>
     </div>

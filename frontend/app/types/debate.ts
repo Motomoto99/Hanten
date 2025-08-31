@@ -27,3 +27,15 @@ export interface DebateDetailData {
     is_participating: boolean; // ユーザーが参加中かどうか
     user_participation: { position: string | null; };
 }
+
+// APIから受け取るディベート部屋の型を定義
+export interface Debate {
+    id: number;
+    room_name: string;
+    room_start: string;
+    room_end: string;
+    theme_title: string;
+    participant_count: number; // 参加者数
+    is_participating: boolean; // ユーザーが参加中かどうか
+    has_unread_messages: boolean; // 未読メッセージがあるかどうか
+}

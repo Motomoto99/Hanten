@@ -12,6 +12,7 @@ from .serializers import DebateEvaluationSerializer,UserProfileSerializer
 from django.db.models import Count
 from django.db.models import Exists, OuterRef, Count, Value,BooleanField
 from django.utils import timezone
+from django.db.models import Subquery, OuterRef, Max, Case, When
 
 
 class Me(APIView):
@@ -103,6 +104,30 @@ class ParticipatedDebateListView(generics.ListAPIView):
 
         # ★★★ 2. その後で、このユーザーが参加している部屋だけを、選び出す ★★★
         queryset = all_rooms_with_count.filter(participants=user).order_by('-room_start')
+
+        # ユーザーの最終既読コメント ID を取得するサブクエリ
+        last_read_comment_id_subquery = CommentReadStatus.objects.filter(
+            room=OuterRef('pk'),
+            user=user
+        ).values('last_read_comment_id')[:1]
+
+        # 部屋の最新コメント ID
+        latest_comment_id_subquery = Comment.objects.filter(
+            room=OuterRef('pk')
+        ).order_by('-id').values('id')[:1]
+
+        queryset = Room.objects.annotate(
+            participant_count=Count('participate', distinct=True),
+            is_participating=Exists(is_participating_subquery),
+            has_unread_messages=Case(
+                When(
+                    Subquery(latest_comment_id_subquery) > Subquery(last_read_comment_id_subquery),
+                    then=Value(True)
+                ),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
+        )
 
         # ステータス（開催中か終了済みか）でフィルタリング
         status = self.request.query_params.get('status', 'ongoing')

@@ -16,6 +16,8 @@ from django.db.models import Exists, OuterRef, Count, Value,BooleanField
 from django.http import JsonResponse
 import openai
 from django.conf import settings
+from django.db.models import Subquery, OuterRef, Max
+from django.db.models import Subquery, OuterRef, Max, Case, When, Exists,F
 # from api.permissions.clerk import ClerkAuthenticated
 
 # ディベート部屋の一覧を取得・作成するAPIビュー
@@ -30,41 +32,67 @@ class DebateListCreateAPIView(generics.ListCreateAPIView):
         # まず、Clerkの認証情報を安全に取得
         clerk_user_info = getattr(self.request, 'clerk_user', None)
         
-        # 基本となるクエリセットを用意
-        queryset = Room.objects.select_related('theme').annotate(
-            participant_count=Count('participate', distinct=True)
-        ).order_by('-room_start')
+        # ベース。ここから “追記” で annotate していく（再代入で Room.objects... に戻さない）
+        queryset = (
+            Room.objects
+            .select_related('theme')
+            .annotate(participant_count=Count('participate', distinct=True))
+            .order_by('-room_start')
+        )
 
-        # Clerkの認証情報が存在し、IDが取得できる場合のみ、参加状態をチェックする
+        # デフォルト（未ログイン/未登録時）
+        queryset = queryset.annotate(
+            is_participating=Value(False, output_field=BooleanField()),
+            has_unread_messages=Value(False, output_field=BooleanField()),
+        )
+
         if clerk_user_info and clerk_user_info.get('id'):
             try:
-                # 本物の身分証明書(clerk_user_id)を使って、DBから本当のユーザーを探す
-                user = User.objects.get(clerk_user_id=clerk_user_info.get('id'))
-                
-                # 見つけた本当のユーザーで、参加状態を問い合わせるサブクエリを作成
+                user = User.objects.get(clerk_user_id=clerk_user_info['id'])
+
+                # 参加中フラグ
                 is_participating_subquery = Participate.objects.filter(
-                    room=OuterRef('pk'), 
-                    user=user
+                    room=OuterRef('pk'), user=user
                 )
-                queryset = queryset.annotate(is_participating=Exists(is_participating_subquery))
+                queryset = queryset.annotate(
+                    is_participating=Exists(is_participating_subquery)
+                )
+
+                # 既読コメントの日時（CommentReadStatus → last_read_comment → post_date）
+                last_read_time_sq = CommentReadStatus.objects.filter(
+                    room=OuterRef('pk'),
+                    user=user,
+                ).values('last_read_comment__post_date')[:1]
+
+                # 部屋ごとの最新コメント日時
+                # ↓ ここは Comment の reverse name に合わせて修正してください。
+                #   - related_name='comments' なら 'comments__post_date'
+                #   - related_name 未指定(デフォルト)なら 'comment_set__post_date'
+                queryset = queryset.annotate(
+                    latest_comment_time=Max('comments__post_date'),   # ←要調整
+                    last_read_time=Subquery(last_read_time_sq),
+                ).annotate(
+                    has_unread_messages=Case(
+                        # 仕様：last_read が無い（まだ入室していない）なら False
+                        When(last_read_time__isnull=True, then=Value(False)),
+                        # 最新 > 既読 なら True
+                        When(latest_comment_time__gt=F('last_read_time'), then=Value(True)),
+                        default=Value(False),
+                        output_field=BooleanField(),
+                    )
+                )
 
             except User.DoesNotExist:
-                # 万が一、ClerkにはいるがDBにいないユーザーの場合（ありえないはずですが念のため）
-                queryset = queryset.annotate(is_participating=Value(False, output_field=BooleanField()))
-        else:
-            # ログインしていない、または認証情報が不正なユーザーは、何にも参加していない
-            queryset = queryset.annotate(is_participating=Value(False, output_field=BooleanField()))
+                # 何もしない（デフォルトの False 注入が効いている）
+                pass
 
-        # ... (以降のフィルタリングロジックは変更なし)
+        # 開催中/終了でフィルタ
         status = self.request.query_params.get('status', 'ongoing')
         now = timezone.now()
-        print(f"--- [DEBUG] サーバーの現在時刻 (UTC): {now} ---")
-
         if status == 'ongoing':
             return queryset.filter(room_end__gt=now)
         elif status == 'finished':
             return queryset.filter(room_end__lte=now)
-        
         return queryset
 
     def get_serializer_class(self):

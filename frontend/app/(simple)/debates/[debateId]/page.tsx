@@ -49,7 +49,6 @@ export default function ChatPage() {
 
                 // 3. 生成したURLを、「記憶ノート」に書き込み、Reactに「覚えておいて！」と伝えます
                 setSocketUrl(newSocketUrl);
-                console.log("WebSocket URLを生成しました:", newSocketUrl);
             }
         };
         generateUrl();
@@ -92,8 +91,6 @@ export default function ChatPage() {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                // 監視カメラを設置：届いた荷物の中身を、まず目で見る！
-                console.log("バックエンドから届いた生データ:", messagesRes.data);
 
                 // 荷物の中身が、本当に期待通りの形をしているか、厳しくチェックする
                 if (messagesRes.data && Array.isArray(messagesRes.data.results)) {
@@ -131,11 +128,8 @@ export default function ChatPage() {
 
     // 新しいメッセージが届いたときの処理を行うuseEffectフック
     useEffect(() => {
-        console.log("新しいメッセージが届きました:", lastMessage);
         if (lastMessage !== null) {
             const isScrolledToBottom = commentListRef.current && commentListRef.current.scrollHeight - commentListRef.current.scrollTop <= commentListRef.current.clientHeight + 100;
-            console.log("スクロールのタカさ:", commentListRef.current?.scrollHeight);
-            console.log("現在のスクロール位置:", commentListRef.current?.scrollTop);
             const data = JSON.parse(lastMessage.data);
             if (data.type === 'chat_message') {
                 const newMessage: Message = data.message;
@@ -150,7 +144,6 @@ export default function ChatPage() {
                     }, 100);
                 }
             }
-            console.log("現在のメッセージ一覧:", messages);
         }
     }, [lastMessage]);
 
@@ -165,7 +158,6 @@ export default function ChatPage() {
             // ▼▼▼【useWebSocket.sendMessage を、ただの sendMessage に修正】▼▼▼
             sendMessage(JSON.stringify(payload));
         }
-        console.log("メッセージ送信:", content);
         setContent(''); // メッセージ送信後は入力欄をクリア
     }
 
@@ -173,7 +165,6 @@ export default function ChatPage() {
     const userScrolled = useRef(false);
     useEffect(() => {
         const listElement = commentListRef.current;
-        console.log("コメントリストの要素:", listElement);
         if (!listElement) return;
 
         let timeoutId: NodeJS.Timeout;
@@ -183,7 +174,6 @@ export default function ChatPage() {
             timeoutId = setTimeout(() => {
                 // 逆さまの世界では、「一番下」とは「scrollTopが0に近い」こと
                 const isAtBottom = listElement.scrollTop > -20;
-                console.log("現在のスクロール位置:", listElement.scrollTop);
 
                 if (isAtBottom && messages.length > 0) {
                     updateReadStatus(messages[messages.length - 1].id);

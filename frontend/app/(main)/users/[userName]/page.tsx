@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
 import ContentList from '@/app/components/content/ContentList';
-import { Debate } from '@/app/components/content/Content';
+import { Debate } from '@/app/types/debate';
 import styles from '@/app/css/Profile.module.css'; // この画面専用のCSS
 import { DebateDetailData } from '@/app/types/debate';
 import ContentDetail from '@/app/components/content/ContentDetail';

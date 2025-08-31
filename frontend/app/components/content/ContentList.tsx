@@ -1,6 +1,7 @@
 'use client';
 
-import DebateContent, { Debate } from './Content';
+import DebateContent from './Content';
+import { Debate } from '@/app/types/debate';
 import styles from '../../css/Debates.module.css';
 import React, { forwardRef } from 'react'; // forwardRefをインポート
 

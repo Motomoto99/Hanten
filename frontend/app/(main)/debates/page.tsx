@@ -8,7 +8,7 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import ContentList from '@/app/components/content/ContentList';
 import ContentDetail from '@/app/components/content/ContentDetail';
 import { DebateDetailData } from '@/app/types/debate';
-import { Debate } from '@/app/components/content/Content';
+import { Debate } from '@/app/types/debate';
 import styles from '@/app/css/Debates.module.css';
 import { UserProfile } from '@/app/types/user'; // ユーザー情報の型をインポート
 

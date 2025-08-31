@@ -19,8 +19,8 @@ interface Props {
 }
 
 export default function Content({ debate, onClick }: Props) {
-  const startDate = new Date(debate.room_start).toLocaleDateString();
-  const endDate = new Date(debate.room_end).toLocaleDateString();
+  const startDate = new Date(debate.room_start).toLocaleString('ja-JP');
+  const endDate = new Date(debate.room_end).toLocaleString('ja-JP');
   const isFinished = new Date(debate.room_end) <= new Date();
 
   return (

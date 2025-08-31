@@ -267,13 +267,35 @@
 }
 
 /* 終了画面 */
-.finishedTitle{
-   font-size: 1.8rem;
-   padding-bottom: 1rem;
-   border-bottom: 2px solid #705c7848;
+.finishedTitle {
+    font-size: 1.8rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #705c7848;
 }
-.finishedContainer{
-    padding:1rem;
-    max-width: 500px;;
-    margin:0 auto;
+
+.finishedContainer {
+    padding: 1rem;
+    max-width: 500px;
+    ;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.unreadIndicator {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    color: white;
+    margin-left: auto;
+    background-color: #e74c3c;
+}
+
+.date{
+    display: flex;
 }

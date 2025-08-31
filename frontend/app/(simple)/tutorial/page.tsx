@@ -37,6 +37,7 @@ function TutorialComponent() {
         <p className={styles.description}>ユーザー名を登録してください</p>
         <input
           type="text"
+          maxLength={20}
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
           placeholder="例：ジョウタロウ"

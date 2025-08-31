@@ -42,6 +42,7 @@ export default function CommentInput({
                 ref={textareaRef}
                 className={styles.textarea}
                 value={value}
+                maxLength={500}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 rows={1} // 最初は1行で表示

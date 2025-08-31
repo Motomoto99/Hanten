@@ -91,9 +91,10 @@ export default function page() {
         <label>ディベート部屋名</label>
         <input
           type="text"
+          maxLength={50}
           value={roomName}
           onChange={(e) => setRoomName(e.target.value)}
-          placeholder="（例）消費税について話したい"
+          placeholder="例：消費税について話したい　（50字以内）"
         />
       </div>
 

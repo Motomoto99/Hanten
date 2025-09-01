@@ -167,6 +167,15 @@ class FirstMessageAPIView(generics.CreateAPIView):
                     comment_text=content
                 )
                 print("[SUCCESS] 最初のメッセージの投稿完了。")
+
+                # 既読状態を更新（最新のコメントを既読にする）
+                CommentReadStatus.objects.update_or_create(
+                    user=user,
+                    room=room,
+                    defaults={'last_read_comment': comment}
+                )
+                print("[SUCCESS] 既読状態を更新。")
+
                 # ★★★ WebSocketグループにメッセージをブロードキャスト ★★★
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(

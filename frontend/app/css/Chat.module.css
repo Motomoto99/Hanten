@@ -1,7 +1,7 @@
 .chatContainer {
     display: flex;
     flex-direction: column;
-    height: 85dvh;
+    height:98dvh;
     /* 親のレイアウトに高さいっぱいで広がる */
 
     /* ★★★ モバイルのキーボード問題を解決するおまじない ★★★ */
@@ -164,3 +164,11 @@
 }
 
 /* 反対派のタグ色 */
+
+
+.newMessageButton{
+    background-color: #4fc569;
+    border: none;
+    border-radius: 5px;
+    color: white;
+}

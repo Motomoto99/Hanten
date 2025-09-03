@@ -5,14 +5,14 @@ from rest_framework import status
 from rest_framework import generics
 
 from api.user.models import User
-from api.debate.models import Room, Participate, Comment
+from api.debate.models import Room, Participate, Comment,CommentReadStatus
 from .serializers import UserSerializer
 from api.debate.serializers import RoomListSerializer
 from .serializers import DebateEvaluationSerializer,UserProfileSerializer
 from django.db.models import Count
 from django.db.models import Exists, OuterRef, Count, Value,BooleanField
 from django.utils import timezone
-from django.db.models import Subquery, OuterRef, Max, Case, When
+from django.db.models import Subquery, OuterRef, Max, Case, When,F
 
 
 class Me(APIView):
@@ -78,9 +78,11 @@ class Me(APIView):
         
         print('/user/me/のPUTリクエスト受信:', clerk_user_id, new_user_name)
         # ユーザー名と初回フラグを更新
-        user.user_name = new_user_name
-        user.first_flag = False
-        user.save()
+        if clerk_user_id == user.user_name:
+            # 初回ログイン時のみ更新を許可
+            user.user_name = new_user_name
+            user.first_flag = False
+            user.save()
 
         return Response(status=status.HTTP_200_OK)
 
@@ -105,26 +107,26 @@ class ParticipatedDebateListView(generics.ListAPIView):
         # ★★★ 2. その後で、このユーザーが参加している部屋だけを、選び出す ★★★
         queryset = all_rooms_with_count.filter(participants=user).order_by('-room_start')
 
-        # ユーザーの最終既読コメント ID を取得するサブクエリ
-        last_read_comment_id_subquery = CommentReadStatus.objects.filter(
+        # 既読コメントの日時（CommentReadStatus → last_read_comment → post_date）
+        last_read_time_sq = CommentReadStatus.objects.filter(
             room=OuterRef('pk'),
-            user=user
-        ).values('last_read_comment_id')[:1]
+            user=user,
+        ).values('last_read_comment__post_date')[:1]
 
-        # 部屋の最新コメント ID
-        latest_comment_id_subquery = Comment.objects.filter(
-            room=OuterRef('pk')
-        ).order_by('-id').values('id')[:1]
-
-        queryset = Room.objects.annotate(
-            participant_count=Count('participate', distinct=True),
-            is_participating=Exists(is_participating_subquery),
+        # 部屋ごとの最新コメント日時
+        # ↓ ここは Comment の reverse name に合わせて修正してください。
+        #   - related_name='comments' なら 'comments__post_date'
+        #   - related_name 未指定(デフォルト)なら 'comment_set__post_date'
+        queryset = queryset.annotate(
+            latest_comment_time=Max('comments__post_date'),   # ←要調整
+            last_read_time=Subquery(last_read_time_sq),
+        ).annotate(
             has_unread_messages=Case(
-                When(
-                    Subquery(latest_comment_id_subquery) > Subquery(last_read_comment_id_subquery),
-                    then=Value(True)
-                ),
-                default=Value(False),
+                # 仕様：last_read が無い（まだ入室していない）なら False
+                When(last_read_time__isnull=True, then=Value(False)),
+                # 最新 > 既読 なら True
+                When(latest_comment_time__gt=F('last_read_time'), then=Value(True)),
+                        default=Value(False),
                 output_field=BooleanField(),
             )
         )

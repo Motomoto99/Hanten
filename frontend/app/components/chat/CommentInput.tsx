@@ -24,6 +24,7 @@ export default function CommentInput({
     const handleSend = () => {
         if (value.trim() && !isLoading) {
             onSendMessage(value.trim());
+            textareaRef.current?.focus();
         }
     };
 
@@ -36,6 +37,14 @@ export default function CommentInput({
         }
     }, [value]);
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        // Ctrlキー（MacならCmdキー）と、Enterキーが、同時に押されたら…
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault(); // 元々のEnterキーの動作（改行）をキャンセル
+            handleSend(); // そして、送信処理を呼び出す！
+        }
+    };
+
     return (
         <div className={styles.container}>
             <textarea
@@ -47,6 +56,7 @@ export default function CommentInput({
                 placeholder={placeholder}
                 rows={1} // 最初は1行で表示
                 disabled={isLoading}
+                onKeyDown={handleKeyDown} 
             />
             <button
                 onClick={handleSend}

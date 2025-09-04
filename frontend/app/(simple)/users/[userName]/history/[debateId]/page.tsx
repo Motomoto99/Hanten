@@ -88,6 +88,7 @@ export default function EvaluationPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setFeedback(res.data.feedback);
+            setHasFeedback(true); // 生成できたら、フラグを立てる
         } catch (error) {
             console.error("AIフィードバックの生成に失敗", error);
             setFeedback("エラーが発生しました。");
@@ -190,7 +191,7 @@ export default function EvaluationPage() {
                     {isChatLoading && <div>読み込み中...</div>}
                     {showChat && (
                         <div className={styles.chatHistoryContainer}>
-                            <CommentList messages={chatMessages}  />
+                            <CommentList messages={chatMessages} />
                         </div>
                     )}
                 </div>
